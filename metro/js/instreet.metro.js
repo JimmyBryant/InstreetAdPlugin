@@ -29,7 +29,7 @@
    imagesList=[],
    readyList=[],
    sizeList=[250,250],   //广告尺寸数组，w=config.sizeNum*2 ,h=config.sizeNum*2+1
-   themeList={'red':0,'yellow':1,'green':2,'blue':3,'brown':4},
+   themeList=['red','yellow','green','blue','purple','brown'],
    firstImage=true,
    prefix="http://monkey.instreet.cn/",
    container;
@@ -634,28 +634,28 @@
 			}
 				
 		};
-		// 预加载图片
-		var loadImage = function(img,callback){
 
-			 var image=new Image();
-			 if(typeof image.src=="undefined")        //没有src属性则退出
-			 	return;
-			 image.src=img.src;
-			 image.ins_index=img.ins_index;
-			 if(image.complete){
-			    callback&&callback(image);
-			 }else{
-				 image.onload=function(){					   
-				   var obj=this;
-				   obj.onload=null;
-				   callback&&callback(image);  
-				 }				 
-		     }
+		// 请求图片的广告数据
+		var requestAdsData = function(img){
+			// 预加载图片
+			var loadImage = function(img,callback){
 
-		};
-		// 请求广告数据
-		var RequestAdsData = function(){
+				 var image=new Image();
+				 if(typeof image.src=="undefined")        //没有src属性则退出
+				 	return;
+				 image.src=img.src;
+				 image.ins_index=img.ins_index;
+				 if(image.complete){
+				    callback&&callback(image);
+				 }else{
+					 image.onload=function(){					   
+					   var obj=this;
+					   obj.onload=null;
+					   callback&&callback(image);  
+					 }				 
+			     }
 
+			};
 			// 用于图片onload回调
 			var loadHandle = function(img){
 
@@ -691,14 +691,7 @@
 
 			};
 
-			var images=document.getElementsByTagName('img');
-			for(var i=0,len=images.length;i<len;i++){
-		   	  var img=images[i];
-		   	  imagesList[i]=img;
-		   	  img.ins_index=i;
-		   	  img.setAttribute("instreet_img_id",i);
-		   	  loadImage(img,loadHandle);
-			}
+			loadImage(img,loadHandle);	
 
 		};
 
@@ -716,7 +709,13 @@
 			for(var i in adsObjectArray){
 				var ad=adsObjectArray[i];
 				if(ad.box&&ad.box.firstChild){
-					ad.box.firstChild.className="ins-wrapper ins-"+theme+"style ins-size"+sizeList[config.sizeNum*2];
+					ad.box.firstChild.className="ins-wrapper ins-"+themeList[theme]+"style ins-size"+sizeList[config.sizeNum*2];
+					// 调整footer的themelist
+					var footer=ad.footer;
+					var selected=U.$$(footer,'selected')[0];
+					selected.className="";
+					footer.getElementsByTagName('li')[theme].className="selected";
+
 				}
 				
 			}
@@ -727,11 +726,13 @@
 		var InstreetAd = function(data,container){
 
 			var img=imagesList[data.index];
+			this.insIndex=data.index;
 			this.adsData=data;
 			this.container=container;
 			this.image=img;
-			this.imageInfo={width:img.clientWidth,height:img.clientHeight,src:img.src,pos:U.getXY(img)};
 			this.spotsArray=[];
+			this.timer=null;		//该计时器用于locate函数
+			this.timerApp=null;     //该计时器用于应用展示
 			// 初始化对象
 			this.init();
 		};
@@ -757,15 +758,16 @@
 				    content=U.createElem('div'),
 				    footer=_.createFooter();
 				box.className="instreet-plugin-box";
-				wrapper.className="ins-wrapper ins-"+config.theme+"style ins-size"+w;
-				line.className="ins-line";
+				wrapper.className="ins-wrapper ins-"+themeList[config.theme]+"style ins-size"+w;
+				css.set(wrapper,'width',0);
+				line.className="ins-colorline clearfix";
 				borderBox.className="ins-borderbox";
 				nav.className="ins-main-nav";
 				content.className="ins-main-content";				
-				borderBox.appendChild(nav);borderBox.appendChild(content);borderBox.appendChild(footer);
-				fragment.appendChild(line);
-				fragment.appendChild(borderBox);
-				wrapper.appendChild(fragment);
+				fragment.appendChild(line);fragment.appendChild(nav);fragment.appendChild(content);fragment.appendChild(footer);
+				
+				borderBox.appendChild(fragment);
+				wrapper.appendChild(borderBox);
 				box.appendChild(wrapper);
 				_.container.appendChild(box);
 				// 添加属性
@@ -775,37 +777,66 @@
 				_.box=box;
 			},
 			createApps   : function(){
-				var _ = this;
+
+				var _ = this,timer=null,wrapper=_.box.firstChild;
+				var fillLine = function(){
+					var line=U.$$(_.box,'ins-colorline')[0],len=_.nav.children.length;
+					line.className+=" ins-column"+len,str="";
+					len=len==5?len:len==4?len:6;
+					for(var i=0;i<len;i++){
+						str+='<span class="'+themeList[i]+'"></span>'
+					}
+					line.innerHTML=str;
+				},
+				overHandler = function(){
+
+					clearTimeout(timer);
+					InstreetAd.slideOut(wrapper);
+
+				},
+				outHandler = function(){
+
+					timer = setTimeout(function(){InstreetAd.slideIn(wrapper);},config.timer);
+
+				};
+
 				for(var i in InstreetAd.apps){
 					InstreetAd.apps[i]&&InstreetAd.apps[i](_);
 				}
+				// 填充clolorline
+				fillLine();
+				// 为图片绑定mouseover、mouseout事件
+				U.bind(_.image,'mouseover',overHandler);
+				U.bind(_.image,'mouseout',outHandler);
+				// 为plugin-box绑定mouseover、mouseout事件
+				U.bind(_.box,'mouseover',overHandler);
+				U.bind(_.box,'mouseout',outHandler);
 				_.nav.className+=' ins-nav'+_.nav.children.length;
-				_.nav.firstChild.className+=" selected";
-				_.nav.lastChild.className+=" last";
 				_.content.firstChild.className+=" content-item-selected";
 			},
 			createNavItem : function(type,text){
 				var _=this,li=U.createElem('li');
-				li.className='nav-item';
+				li.className=_.nav.children.length?'nav-item':'nav-item first selected';
 				li.innerHTML='<div><em class="icon-'+type+'"></em><span>'+text+'</span></div>';
 				_.nav.appendChild(li);
 				// 为nav-item绑定事件
-				var timerId=null;
+				var timer=null;
 				li.onmouseover=function(){
 
 					if(this.className.indexOf('selected')==-1){
 						var li=this;
 
-						timerId=setTimeout(function(){
+						timer = setTimeout(function(){
 
 							var nav=U.$$(_.nav,'selected')[0],content=U.$$(_.content,'content-item-selected')[0],
-								next=U.$$(_.content,type+'-item')[0];
+								next=U.$$(_.content,type+'-item')[0],borderbox=_.nav.parentNode,wrapper=borderbox.parentNode;
 							nav.className=nav.className.replace(" selected","");
 							li.className+=" selected";
 							Animate(content).stop(true).animate({'opacity':0},200,function(){
 								this.className=this.className.replace(" content-item-selected","");
 								next.className+=" content-item-selected";
 								css.set(next,{'opacity':1});
+								css.set(wrapper,'height',css.get(borderbox,'height'));
 							})
 
 						},200);
@@ -815,30 +846,23 @@
 				};
 				li.onmouseout=function(){
 					// 清除定时器
-					clearTimeout(timerId);
-					timerId=null;
-				}
+					clearTimeout(timer);
+					timer=null;
+				};
 			},
 			createFooter : function(){
 				var _=this,footer=U.createElem('div'),list=footer.getElementsByTagName('li');
 				footer.className="ins-footer";
-				footer.innerHTML='<div>powered by <a target="_blank" href="#">instreet</a><ul class="style-list"><li><a class="red" href="javascript:;"></a></li><li><a class="yellow" href="javascript:;"></a></li><li><a class="green" href="javascript:;"></a></li><li><a class="blue" href="javascript:;"></a></li><li><a class="brown" href="javascript:;"></a></li></ul></div>'
-				list[themeList[config.theme]].className="selected";
+				footer.innerHTML='<div>powered by <a target="_blank" href="#">instreet</a><ul class="theme-list"><li><a class="red" index="0" href="javascript:;"></a></li><li><a class="yellow" index="1" href="javascript:;"></a></li><li><a class="green" index="2" href="javascript:;"></a></li><li><a class="blue" index="3" href="javascript:;"></a></li><li><a class="purple" index="4" href="javascript:;"></a></li><li><a class="brown" index="5" href="javascript:;"></a></li></ul></div>'
+				list[config.theme].className="selected";
 				// 为li绑定点击事件
 				footer.onclick=function(e){
 
 					var event=U.getEvent(e),tar=U.getTarget(event);
 					if(tar.parentNode.tagName=="LI"||tar.tagName=='LI'){
 
-						var theme=tar.tagName=='LI'?tar.firstChild.className:tar.className;
-						if(config.theme!=theme){
-							var selected=U.$$(footer,'selected')[0];
-							selected.className="";
-							if(tar.tagName=='LI'){
-								tar.className="selected";
-							}else{
-								tar.parentNode.className="selected";
-							}							
+						var theme=tar.tagName=='LI'?tar.firstChild.getAttribute("index"):tar.getAttribute("index");
+						if(config.theme!=theme){							
 							changeTheme(theme);
 						}
 
@@ -849,32 +873,70 @@
 			},
 			locate   :  function(){     //定位instreet-plugin-box
 
-				var _=this,img=_.image,pos=U.getXY(img),top=pos.y+"px",left=(pos.x+img.offsetWidth)+"px";
-				css.set(_.box,{'top':top,'left':left});
-				!U.isVisible(img)&&css.set(_.box,'display','none');
+				var _=this;
+				clearTimeout(_.timer);
+
+				_.timer=setTimeout(function(){
+					var img=_.image,pos=U.getXY(img),w=sizeList[config.sizeNum*2]+18,h=parseFloat(css.get(_.box,'height')),top=pos.y+"px",maxTop=pos.y+img.clientHeight-h,
+					W=Math.max(document.body.clientWidth,document.documentElement.clientWidth),scrollTop=window.pageYOffset||document.documentElement.scrollTop||0;
+					_.imageInfo={width:img.clientWidth,height:img.clientHeight,x:pos.x,y:pos.y,scrollTop:scrollTop,src:img.src};
+
+					if(scrollTop>maxTop){
+						top=maxTop+"px";
+					}else if(pos.y<scrollTop&&scrollTop<=maxTop){
+						top=scrollTop+"px";
+					}
+					// 判断图片右侧空间是否充足
+					if(W<(pos.x+img.clientWidth+w)){
+						var right=(W-pos.x-img.clientWidth)+"px";						
+						css.set(_.box,{'top':top,'right':right,'left':'auto'});
+						css.set(_.box.lastChild.lastChild,{left:0,right:'auto'});
+					}else{
+						var left=(pos.x+img.offsetWidth)+"px"
+						css.set(_.box,{'top':top,'left':left,'right':'auto'});
+						css.set(_.box.lastChild.lastChild,{left:'auto',right:0});
+					}
+					!U.isVisible(img)&&css.set(_.box,'display','none');}
+				,100);
 
 			},
-			relocate : function(){	//重新定位
+			checkLocation : function(){		//检察位置是否正确
 
-				var _=this,img=_.image,pos=U.getXY(img),info=_.imageInfo;
-				var modifyInfo = function(){
-					info.pos=pos;
-					info.width=img.clientWidth;
-					info.height=img.clientHeight;
-				};
-				if(pos.x!==info.pos.x||pos.y!==info.pos.y||img.clientWidth!=info.width||img.clientHeight!=info.height){	   //图片位置或者尺寸发生变化
+				var _=this,img=_.image,pos=U.getXY(img),info=_.imageInfo,scrollTop=window.pageYOffset||document.documentElement.scrollTop||0;;
+
+				if(typeof info=="undefined"){
+					return;
+				}
+				
+				if(pos.x!==info.x||pos.y!==info.y||scrollTop!==info.scrollTop||img.clientWidth!==info.width||img.clientHeight!==info.height){	   //图片位置或者尺寸发生变化					
 					
-					modifyInfo();
 					_.locate();
+
 
 				}else if(typeof img.src!="undefined"&&img.src!=info.src){  //幻灯片，图片src发生变化
 
-					loadImage(img);										
+					requestAdsData(img);										
 
 				}
 			}
 		});
+		
 
+		InstreetAd.slideOut = function(wrapper){
+
+			var borderbox=wrapper.lastChild,w=parseFloat(css.get(wrapper,'width')),W=css.get(borderbox,'width'),H=css.get(borderbox,'height');
+
+			if(w<=0){
+				css.set(wrapper,'height',H);
+				Animate(wrapper).animate({width:W},300);
+			}
+
+		};
+		InstreetAd.slideIn = function(wrapper){
+
+			Animate(wrapper).animate({width:0});
+
+		};
 
 		// 静态属性
 		InstreetAd.apps = {
@@ -912,7 +974,7 @@
 				  str+='<i class="small-info"></i>'+frame;
 			    
 			    }
-			  	// ad.innerHTML=str;
+			  	ad.innerHTML=str;
 			  	obj.content.appendChild(ad);	//插入ad到content
 			},
 			// 折扣
@@ -1007,16 +1069,17 @@
 
 
 
-		// relocate 对所有的instreetAd对象重新定位
-		var relocate = function(){
+		//  对所有的instreetAd对象重新定位
+		var checkLocation = function(){
 
-			var timer=null,arr=adsObjectArray;
-
-			timer = setInterval(function(){
+			var arr=adsObjectArray;
+			function loop(){
 				for(var i=0;i<arr.length;i++){
-					arr[i]&&arr[i].relocate();
+					arr[i]&&arr[i].checkLocation();
 				}
-			},200);
+				setTimeout(loop,400);
+			};
+			setTimeout(loop,400);
 
 		};
 
@@ -1028,14 +1091,22 @@
 			// 创建container
 			container=U.createElem("div");
 			container.className="instreet-plugin-container";
+			css.set(container,'display','none');
 			document.body&&document.body.firstChild&&document.body.insertBefore(container,document.body.firstChild);
 			// 获取cookie
 			var theme=U.getCookie('instreet_theme');
-			config.theme=theme||"red";
-			// 请求广告数据
-			RequestAdsData();
-			// relocate
-			relocate();
+			config.theme=theme||0;
+			// 请求图片关联的广告数据
+			var images=document.getElementsByTagName('img');
+			for(var i=0,len=images.length;i<len;i++){
+		   	  var img=images[i];
+		   	  imagesList[i]=img;
+		   	  img.ins_index=i;
+		   	  img.setAttribute("instreet_img_id",i);
+		   	  requestAdsData(img);
+			}
+			// check location是否反生变化
+			checkLocation();
 		};
 
 		// 执行init方法
