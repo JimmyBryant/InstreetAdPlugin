@@ -1029,16 +1029,55 @@
 			weiboApp : function(obj){
 				if(!config.showWeibo||obj.adsData.weiboSpot.length==0)
 					return;
-				var data=obj.adsData;
 				obj.createNavItem('weibo','微博');
+				var data=obj.adsData,weibo=U.createElem("div"),list=U.createElem('ul'),str="",avatar,
+					icon,title,article,redUrl,cn='';
+				weibo.className="content-item weibo-item";
+				list.className="ins-weibo-list";
+
+				for(var i=0,len=data.weiboSpot.length;i<len;i++){
+					var app=data.weiboSpot[i],arr=app.avatar.split('/');
+					for(var j=0,l=arr.length;j<l;j++){
+						if(arr[j]==50)arr[j]=180;
+					}
+					cn=i==len-1?'last':'';				
+					avatar=arr.join('/');
+					icon=app.icon;
+					title=app.title;
+					article=app.latestStatus;
+					redUrl=config.redurl+"?tty=1&mx="+app.metrix+"&muh="+data.imageUrlHash+"&pd="+data.widgetSid+"&ift="+app.type+"&at=&ad=&rurl="+encodeURIComponent(encodeURIComponent(app.userUrl));
+					str+='<li class="'+cn+'"><a href="'+redUrl+'" target="_blank" class="ins-weibo-avatar" title="'+title+'"><img src="'+avatar+'"/></a><div class="ins-weibo-main"><p class="name"><span>'+title+'</span><a class="ins-weibo-icon" href="'+redUrl+'" target="_blank"><img src="'+icon+'"></a></p><p class="content">'+article+'</p></li>';
+				}
+
+				list.innerHTML=str;
+				weibo.appendChild(list);
+				obj.content.appendChild(weibo);				
 			},
 			// 百科
 			wikiApp  : function(obj){
 
 				if(!config.showWiki||obj.adsData.wikiSpot.length==0)
-					return;
-				var data=obj.adsData;
+					return;				
 				obj.createNavItem('wiki','百科');
+
+				var data=obj.adsData,wiki=U.createElem("div"),list=U.createElem('ul'),str="",avatar,
+					title,article,redUrl,cn='';
+				wiki.className="content-item wiki-item";
+				list.className="ins-wiki-list";
+				for(var i=0,len=data.wikiSpot.length;i<len;i++){
+					var app=data.wikiSpot[i];
+
+					cn=i==len-1?'last':'';				
+					avatar=app.firstimg||"";
+					title=app.title;
+					article=app.summary;
+					redUrl=config.redurl+"?tty=1&mx="+app.metrix+"&muh="+data.imageUrlHash+"&pd="+data.widgetSid+"&ift="+app.type+"&at=&tg="+encodeURIComponent(encodeURIComponent(title))+"&rurl="+encodeURIComponent(encodeURIComponent(app.url));
+					str+='<li class="'+cn+'"><div class="ins-wiki-nav"><a href="'+redUrl+'" class="avatar" title="'+title+'" target="_blank"><img src="'+avatar+'"/></a><p><span>'+title+'</span></p></div><div class="ins-wiki-main"><p class="summary"><span>'+article+'</span></p></li>';
+				}
+
+				list.innerHTML=str;
+				wiki.appendChild(list);
+				obj.content.appendChild(wiki);	
 
 			},
 		    // 新闻
