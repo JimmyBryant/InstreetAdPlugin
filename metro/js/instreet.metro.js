@@ -289,6 +289,22 @@
 		   }
 
 		};
+		// fadeIn方法
+		Animate.prototype.fadeIn=function(duration, easing, callback){ 
+			var _=this,elem=_.elem;
+			if(css.get(elem,'display')=='none'){
+				css.set(elem,{opacity:0,display:'block'});
+			}
+			_.animate({opacity:1},duration, easing, callback);
+		};
+
+		// fadeOut方法
+		Animate.prototype.fadeOut=function(duration, easing, callback){ 
+			var _=this,elem=_.elem;
+			duration=duration||400;
+			easing=easing||'swing';
+			_.animate({opacity:0},duration,easing,function(){css.set(elem,'display','none');callback&&callback();});
+		};
 
 	    Animate.prototype.stop=function(end){  //停止某个dom元素的动画  end为true则会把动画进行到最后一帧 false则停止到当前帧
 	    	var elem=this.elem;
@@ -630,10 +646,24 @@
 			  img.setAttribute('instreet_data_ready',true);
 			  var ad=new InstreetAd(data,container);
 			  adsObjectArray[index]=ad;
-			  // InstreetAd.autoShow(ad);
 			}
 				
 		};
+
+    	
+        //页面加载时向服务器返回符合要求的图片信息
+
+        recordImage=function(img){
+	       var iu=encodeURIComponent(encodeURIComponent(img.src)),
+		       pd=config.widgetSid,
+			   pu=encodeURIComponent(encodeURIComponent(window.location.href)),
+			   t=encodeURIComponent(encodeURIComponent(document.title)),
+			   ul=config.ourl;
+			var time=new Date().getTime();   
+			  ul+="?iu="+iu+"&pd="+pd+"&t="+t+"&time="+time;
+			  U.importFile('js',ul);
+		   
+	    };
 
 		// 请求图片的广告数据
 		var requestAdsData = function(img){
@@ -662,11 +692,13 @@
 			   var index=img.ins_index,clientImg=imagesList[index];		   
 			   if(img.width>=config.imiw&&img.height>=config.imih){
 			   	 if(clientImg.clientWidth>=config.imiw&&clientImg.clientHeight>=config.imih){  
+
 				   	  if(typeof config.adsLimit=="number"&&config.adsLimit<=0){	
 				   	  	return;
 				   	  }	
-				   	   // InstreetAd.recordImage(clientImg);	 //loadImage action
-				   	   // 为不支持naturalWidth的浏览器增加naturalWidth
+				   	  recordImage(clientImg);	 //loadImage action
+
+				   	  // 为不支持naturalWidth的浏览器增加naturalWidth
 				   	  if(typeof clientImg.naturalWidth=="undefined"||typeof clientImg.naturalHeight=="undefined"){
 				   	   		clientImg.naturalWidth=img.width;
 				   	   		clientImg.naturalHeight=img.height;
@@ -710,6 +742,7 @@
 				var ad=adsObjectArray[i];
 				if(ad.box&&ad.box.firstChild){
 					ad.box.firstChild.className="ins-wrapper ins-"+themeList[theme]+"style ins-size"+sizeList[config.sizeNum*2];
+					ad.controlBox.firstChild.className="ins-"+themeList[theme]+"style";
 					// 调整footer的themelist
 					var footer=ad.footer;
 					var selected=U.$$(footer,'selected')[0];
@@ -733,6 +766,8 @@
 			this.spotsArray=[];
 			this.timer=null;		//该计时器用于locate函数
 			this.timerApp=null;     //该计时器用于应用展示
+			this.isFirstShow=true;	//用于标记广告是否是第一次展示
+			this.isOn=true;			//标记是否启动尚街
 			// 初始化对象
 			this.init();
 		};
@@ -742,10 +777,100 @@
 		
 			init:	function () {
 				var _=this;
+				_.createController();
 				_.createContainer();
 				_.createApps();			
-				// _.bindEvents();
 				_.locate();
+			},
+			createController : function(){		//创建controller按钮
+				var _=this,box=U.createElem('div'),theme=U.createElem('div'),
+					control=U.createElem('div'),share,str='';
+				box.className='instreet-plugin-control';
+				theme.className='ins-'+themeList[config.theme]+'style';
+				control.className="ins-control";
+				css.set(box,'display','none');
+				str+='<a href="javascript:;" class="ins-icon ins-icon-control"></a><div class="ins-bubble"><dl><dt><em class="ins-arrow-top"></em></dt><dd><p>尚街已开启</p></dd></dl></div>';
+				control.innerHTML=str;
+				theme.appendChild(control);
+				// 事件处理函数
+				var overHandler = function(e){
+					var event=U.getEvent(e),rel=U.getRelatedTarget(event);	
+					if(!this.contains(rel)){								
+						Animate(this.lastChild).stop().fadeIn();
+					}
+				};
+				var outHandler = function(e){
+					var event=U.getEvent(e),rel=U.getRelatedTarget(event);
+					if(!this.contains(rel)){
+						Animate(this.lastChild).stop().fadeOut();
+					}
+				};
+				// 根据配置控制是否显示分享按钮
+				if(config.showShareButton){
+					share=U.createElem('div');
+					share.className='ins-share';
+					share.innerHTML='<a href="javascript:;" title="分享图片" class="ins-icon ins-icon-share"></a><div class="ins-bubble"><dl><dt><em class="ins-arrow-top"></em></dt><dd><a href="javascript:;" class="ins-share-sina" title="新浪微博"></a><a href="javascript:;" class="ins-share-tx" title="腾讯微博"></a><a href="javascript:;" class="ins-share-qz" title="QQ空间"></a><a href="javascript:;" class="ins-share-renren" title="人人网"></a></dd></dl></div>';
+					theme.appendChild(share);
+					_.share=share;
+					// 绑定事件
+					share.onmouseover=overHandler;
+					share.onmouseout=outHandler;
+					share.onclick=function(e){
+						var event=U.getEvent(e),tar=U.getTarget(event);
+						if(tar.tagName!='A'||tar.className.indexOf('ins-share-')==-1)
+							return;
+						var picUrl=encodeURIComponent(_.image.src),shareTo=tar.className.replace("ins-share-",""),widgetSid=_.adsData.widgetSid,time=new Date().getTime(),
+							title=encodeURIComponent(document.title),url=encodeURIComponent(location.href),
+			    			recordUrl=config.surl+"?content=''&imgUrl="+encodeURIComponent(picUrl)+"&widgetSid="+widgetSid+"&pageUrl="+encodeURIComponent(location.href)+"&shareTo="+shareTo+"&time="+time,
+							winStr="toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=580, height=500";
+						switch(tar.className){
+							case "ins-share-sina":
+							window.open('http://v.t.sina.com.cn/share/share.php?title='+title+'&url='+url+'&pic='+picUrl,"_blank",winStr);
+                    		break;
+                    		case "ins-share-tx":
+                    		window.open('http://share.v.t.qq.com/index.php?c=share&a=index&title='+title+'&url='+url+'&pic='+picUrl,"_blank",winStr);
+                    		break;
+                    		case "ins-share-qz":
+                    		window.open('http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?showcount=1&url='+url+'&title='+title+'&pics='+picUrl+'&summary=','_blank',winStr);
+                    		break;
+                    		case "ins-share-renren":
+                    		window.open('http://share.renren.com/share/buttonshare.do?link='+url,"_blank",winStr);
+                    		break;
+						}
+						U.importFile('js',recordUrl);     //记录分享行为
+					}
+				}
+
+				box.appendChild(theme);
+				_.container.appendChild(box);
+				_.controlBox=box;
+				_.control=control;
+
+				// 绑定事件
+				control.onmouseover=overHandler;
+				control.onmouseout=outHandler;
+				U.bind(control.firstChild,'click',function(){
+					var p=control.getElementsByTagName('p')[0];
+					if(_.isOn==true){
+						InstreetAd.slideIn(_.box);
+						_.isOn=false;
+						p.innerHTML='尚街已关闭';
+						Animate(this).animate({opacity:0.7});
+						if(share){
+							css.set(share.firstChild,'display','none');
+						}
+					}else{
+						InstreetAd.slideOut(_.box);
+						_.isOn=true;
+						p.innerHTML='尚街已开启'
+						Animate(this).animate({opacity:1});
+						if(share){
+							css.set(share.firstChild,'display','block');
+						}
+						_.recordShow(9);  //记录1次广告展示
+					}
+				});
+
 			},
 			createContainer :function () {
 				var _=this,w=sizeList[config.sizeNum*2]
@@ -759,6 +884,7 @@
 				    footer=_.createFooter();
 				box.className="instreet-plugin-box";
 				wrapper.className="ins-wrapper ins-"+themeList[config.theme]+"style ins-size"+w;
+				css.set(box,'visibility','hidden');
 				css.set(wrapper,'width',0);
 				line.className="ins-colorline clearfix";
 				borderBox.className="ins-borderbox";
@@ -778,7 +904,7 @@
 			},
 			createApps   : function(){
 
-				var _ = this,timer=null,wrapper=_.box.firstChild;
+				var _ = this,timer=null,box=_.box;
 				var fillLine = function(){
 					var line=U.$$(_.box,'ins-colorline')[0],len=_.nav.children.length;
 					line.className+=" ins-column"+len,str="";
@@ -791,12 +917,23 @@
 				overHandler = function(){
 
 					clearTimeout(timer);
-					InstreetAd.slideOut(wrapper);
+					if(!_.isOn){
+						return;
+					}
+					_.recordShow(10) //记录鼠标mouseover到图片的行为
+					Animate(_.control.firstChild).fadeIn();
+					_.share&&Animate(_.share.firstChild).fadeIn();
+					InstreetAd.slideOut(box);
 
 				},
 				outHandler = function(){
-
-					timer = setTimeout(function(){InstreetAd.slideIn(wrapper);},config.timer);
+					if(!_.isOn){
+						return;
+					}
+					timer = setTimeout(function(){
+						Animate(_.control.firstChild).animate({opacity:0.7});
+						_.share&&Animate(_.share.firstChild).fadeOut();InstreetAd.slideIn(box);
+					},config.timer);
 
 				};
 
@@ -811,6 +948,15 @@
 				// 为plugin-box绑定mouseover、mouseout事件
 				U.bind(_.box,'mouseover',overHandler);
 				U.bind(_.box,'mouseout',outHandler);
+				// 统计鼠标mouseover到广告内容的行为
+				_.content.onmouseover = function(e){
+					var event=U.getEvent(e),rel=U.getRelatedTarget(event);
+					if(!this.contains(rel)){
+						_.recordWatch();
+					}
+				};
+				// 为controller绑定mouseover事件
+				U.bind(_.controlBox,'mouseover',function(){clearTimeout(timer);});
 				_.nav.className+=' ins-nav'+_.nav.children.length;
 				_.content.firstChild.className+=" content-item-selected";
 			},
@@ -896,7 +1042,24 @@
 						css.set(_.box,{'top':top,'left':left,'right':'auto'});
 						css.set(_.box.lastChild.lastChild,{left:'auto',right:0});
 					}
-					!U.isVisible(img)&&css.set(_.box,'display','none');}
+					if(U.isVisible(img)){
+						// 定位control
+						css.set(_.controlBox,{top:(pos.y+5)+'px',left:(pos.x+5)+'px','display':'block'});
+						// 显示instreet-plugin-box
+						css.set(_.box,'visibility','visible');
+					}else{
+						css.set(_.controlBox,'display','none');
+						css.set(_.box,'visibility','hidden');
+					}
+					
+					// 自动展示广告
+					if(config.footAuto&&_.isFirstShow){
+						_.recordShow(9)	//记录广告展示
+						InstreetAd.slideOut(_.box);
+						_.isFirstShow=false;
+					}
+											
+				}
 				,100);
 
 			},
@@ -908,7 +1071,18 @@
 					return;
 				}
 				
-				if(pos.x!==info.x||pos.y!==info.y||scrollTop!==info.scrollTop||img.clientWidth!==info.width||img.clientHeight!==info.height){	   //图片位置或者尺寸发生变化					
+				if(img.clientWidth<=0||img.clientHeight<=0){   //针对原图被删除或者display为none的情况              		
+        			var images=document.images;
+        			for(var i=images.length;i--;){
+
+        				if(images[i].src==img.src&&images[i].clientWidth>=config.imiw&&images[i].clientHeight>=config.imih){
+
+        					_.image=images[i];
+        					_.locate();
+        					break;
+        				}
+        			}
+        		}else if(pos.x!==info.x||pos.y!==info.y||scrollTop!==info.scrollTop||img.clientWidth!==info.width||img.clientHeight!==info.height){	   //图片位置或者尺寸发生变化					
 					
 					_.locate();
 
@@ -917,14 +1091,100 @@
 
 					requestAdsData(img);										
 
+				} 
+			},
+   		   recordShow : function(flag){  //统计广告展示次数
+   		   		// flag为10表示鼠标mouseover到图片
+   		   		// flag为9表示广告展示次数
+		       var _=this,data=_.adsData,img=_.image
+				   ,ul=config.iurl,pd=data.widgetSid,muh=data.imageUrlHash
+				   ,iu=encodeURIComponent(encodeURIComponent(img.src)),
+				   adsId="",adsType="",index=0,mx='',time=new Date().getTime(),w=parseFloat(_.box.lastChild.style.width);
+				if(flag==10&&w>0)	//如果广告已经展示则不记录图片mouseover行为
+					return;
+
+				var selected=U.$$(_.content,'content-item-selected')[0];
+				if(selected){
+					if(selected.className.indexOf('ad-item')!=-1){	//推广
+						var app=data.badsSpot[0]; 
+						adsId=app.adsId;
+						adsType=app.adsType;
+						//增加第三方广告展现统计
+						app.adViewMonitorUrl&&U.importFile('js',app.adViewMonitorUrl+'?time='+time);
+					}else if(selected.className.indexOf('shop-item')!=-1){	//折扣
+		
+						index=_.getSelectedIndex();
+						var app=data.adsSpot[index]
+						adsId=app.adsId;
+						adsType=app.adsType;						
+						mx=app.metrix;
+					}else if(tag==9){ //如果展示的不是推广或者折扣并且flag==9，退出
+						return;
+					}
+				}else if(flag==9){  //如果没有应用被展示则不记录广告展示
+					return;
 				}
-			}
+				ul+="?pd="+pd+"&mx="+mx+"&muh="+muh+"&iu="+iu+"&ad="+adsId+"&at="+adsType+"&flag="+flag+"&time="+time;
+				U.importFile('js',ul);
+						   
+		   },   		   
+ 	       recordWatch:function(){   	//统计鼠标移动到广告或者微博、百科等内容的用户行为	       
+
+			      var  _=this,data=_.adsData,
+			      	   img=_.image,
+					   iu=encodeURIComponent(encodeURIComponent(img.src)),
+					   pd=data.widgetSid,
+					   url=config.murl,
+					   mid=data.imageNumId||'',
+					   muh=data.imageUrlHash,
+					   adData,
+					   ad='',
+					   at='',
+					   tg='',
+					   ift=0,
+					   tty=1,
+					   mx='';
+                    var tar=U.$$(_.content,'content-item-selected')[0],cn=tar.className;
+                    if(cn.indexOf('shop-item')!=-1){
+                       var index=_.getSelectedIndex(),app=data.adsSpot[index];
+					   ad=app.adsId;
+					   at=app.adsType;
+					   mx=app.metrix;
+					   tty=0;
+					}else if(cn.indexOf('ad-item')!=-1){
+					   ad=data.badsSpot[0].adsId;
+					   at=data.badsSpot[0].adsType;
+					   tty=0;					
+					}else if(cn.indexOf('weibo-item')!=-1){
+					   ift=2;
+					}else if(cn.indexOf('wiki-item')!=-1){
+					   ift=4;
+					}else if(cn.indexOf('weather-item')!=-1){
+					   ift=7;
+					}else if(cn.indexOf('news-item')!=-1){
+					   ift=5;
+					}else{
+						return;
+					}
+					var time=new Date().getTime();  								
+					url+="?iu="+iu+"&mx="+mx+"&pd="+pd+"&muh="+muh+"&ad="+ad+"&at="+at+"&tty="+tty+"&ift="+ift+"&time="+time;				
+					U.importFile('js',url);				
+			},
+		    getSelectedIndex : function(){
+			   	 var _=this,slider=U.$$(_.content,'slider-nav')[0],selected;
+			 	 selected=slider&&U.$$(slider,'selected')[0];
+			 	 if(!selected)
+			 	 	return 0;
+			 	 else
+			 	 	return selected.getAttribute("index");
+
+		   }
 		});
 		
 
-		InstreetAd.slideOut = function(wrapper){
+		InstreetAd.slideOut = function(box){
 
-			var borderbox=wrapper.lastChild,w=parseFloat(css.get(wrapper,'width')),W=css.get(borderbox,'width'),H=css.get(borderbox,'height');
+			var wrapper=box.lastChild,borderbox=wrapper.lastChild,w=parseFloat(css.get(wrapper,'width')),W=css.get(borderbox,'width'),H=css.get(borderbox,'height');
 
 			if(w<=0){
 				css.set(wrapper,'height',H);
@@ -932,8 +1192,8 @@
 			}
 
 		};
-		InstreetAd.slideIn = function(wrapper){
-
+		InstreetAd.slideIn = function(box){
+			var wrapper=box.lastChild;
 			Animate(wrapper).animate({width:0});
 
 		};
@@ -1021,7 +1281,9 @@
 						selected.className="switch-trigger";
 						tar.className+=" selected";
 						var end=-parseInt(tar.getAttribute("index"))*w;
-						Animate(list).animate({'left':end});
+						Animate(list).animate({'left':end},function(){
+							obj.recordWatch();
+						});
 					}
 				}
 			},
@@ -1046,7 +1308,7 @@
 					title=app.title;
 					article=app.latestStatus;
 					redUrl=config.redurl+"?tty=1&mx="+app.metrix+"&muh="+data.imageUrlHash+"&pd="+data.widgetSid+"&ift="+app.type+"&at=&ad=&rurl="+encodeURIComponent(encodeURIComponent(app.userUrl));
-					str+='<li class="'+cn+'"><a href="'+redUrl+'" target="_blank" class="ins-weibo-avatar" title="'+title+'"><img src="'+avatar+'"/></a><div class="ins-weibo-main"><p class="name"><span>'+title+'</span><a class="ins-weibo-icon" href="'+redUrl+'" target="_blank"><img src="'+icon+'"></a></p><p class="content">'+article+'</p></li>';
+					str+='<li class="'+cn+'"><a href="'+redUrl+'" target="_blank" class="ins-weibo-avatar" title="'+title+'"><img src="'+avatar+'"/></a><div class="ins-weibo-main"><p class="name"><a href="'+redUrl+'" target="_blank">'+title+'</a><a class="ins-weibo-icon" href="'+redUrl+'" target="_blank"><img src="'+icon+'"></a></p><p class="content">'+article+'</p></li>';
 				}
 
 				list.innerHTML=str;
@@ -1105,8 +1367,6 @@
 		    } 
 
 		};
-
-
 
 		//  对所有的instreetAd对象重新定位
 		var checkLocation = function(){
