@@ -68,7 +68,7 @@
 	width: 268px;
 }
 
-/*ins-absolute*/
+/*ins-borderbox*/
 .instreet-plugin-box .ins-borderbox{
 	position: absolute;
 	top: 0;
@@ -81,16 +81,54 @@
 .instreet-plugin-box .ins-size250 .ins-borderbox{
 	width: 268px;
 }
+/*ins-btn-close*/
+.instreet-plugin-box a.ins-btn-close{
+	position: absolute;
+	width: 22px;
+	height: 22px;
+	color: #eee;
+	text-align: center;
+	right: -22px;
+	background-color: #D14C4F;
+	line-height: 20px;
+	font-weight: bold;
+	top: 5px;
+	text-decoration: none;
+	z-index: 99;
+	font-size: 16px;
+}
+.instreet-plugin-box a.ins-btn-close:hover{
+	color:#FFF;
+}
+.instreet-plugin-box a.ins-btn-redstyle{
+	background-color: #D14C4F;
+}
+.instreet-plugin-box a.ins-btn-yellowstyle{
+	background-color: #EAC85D;
+}
+.instreet-plugin-box a.ins-btn-greenstyle{
+	background-color: #4DAF7C;
+}
+.instreet-plugin-box a.ins-btn-bluestyle{
+	background-color: #5F90B0;
+}
+.instreet-plugin-box a.ins-btn-purplestyle{
+	background-color: #C698E1;
+}
+.instreet-plugin-box a.ins-btn-brownstyle{
+	background-color: #64584C;
+}
+
 
 /*color line*/
 .ins-size250 .ins-colorline{
-	background:url(../images/glass-light.png) repeat-x 0 50% #64584C;
+	background:url(../images/metro/glass-light.png) repeat-x 0 50% #64584C;
 	_background-image: none;
 	width: 100%;
 	height: 5px;
 }
 .instreet-plugin-box .ins-colorline span{	
-	background-image: url(../images/glass-light.png);
+	background-image: url(../images/metro/glass-light.png);
 	_background-image: none;
 	background-repeat:  repeat-x;
 	background-position:  0 50%;	
@@ -196,8 +234,8 @@
 }
 
 .instreet-plugin-box ul.ins-main-nav li.nav-item em{
-    background: url("../images/metro_icon_sprites.png") no-repeat scroll 0 0 transparent;
-    _background: url("../images/metro_icon_sprites.gif") no-repeat scroll 0 0 transparent;
+    background: url("../images/metro/metro_icon_sprites.png") no-repeat scroll 0 0 transparent;
+    _background: url("../images/metro/metro_icon_sprites.gif") no-repeat scroll 0 0 transparent;
     display: block;
     margin: 0 auto;
     height: 22px;
@@ -227,7 +265,7 @@
 /*ad item*/
 .instreet-plugin-box .ins-main-content .ad-item{
 
-	background:url(../images/loading.gif) no-repeat center center;
+	background:url(../images/metro/loading.gif) no-repeat center center;
 	position: relative;
 	overflow: hidden;
 }
@@ -260,7 +298,7 @@
 	overflow: hidden;
 }
 .ins-size250 .ins-main-content .shop-item a.product-album{
-	background:url(../images/loading.gif) no-repeat center center;
+	background:url(../images/metro/loading.gif) no-repeat center center;
 	display: block;
 	position: relative;
 	float: left;
@@ -284,8 +322,8 @@
     top :auto;
     bottom: 0;
     left: 0;
-    opacity: 0.95;
-    filter:alpha(opacity=95);
+    opacity: 0.9;
+    filter:alpha(opacity=90);
     width: 100%;
     overflow: hidden;
 }
@@ -352,7 +390,7 @@
     margin-bottom: 0 !important;
 }
 .instreet-plugin-box .weibo-item .ins-weibo-list li a.ins-weibo-avatar{
-	background: url(../images/loading.gif) no-repeat center center transparent;
+	background: url(../images/metro/loading.gif) no-repeat center center transparent;
 	float: left;
 	width: 75px;
 	height: 78px;
@@ -460,7 +498,7 @@
 	display: none;
 }
 .instreet-plugin-box .ins-footer .theme-list a{
-	background-image: url(../images/glass-light.png);
+	background-image: url(../images/metro/glass-light.png);
 	_background-image: none;
 	background-repeat: repeat-x;
 	background-position: 0 50%;
@@ -789,7 +827,7 @@
 }
 
 .instreet-plugin-control .ins-icon{
-	background: url(../images/metro_share.png) no-repeat;
+	background: url(../images/metro/metro_share.png) no-repeat;
     color: #FFFFFF;
 	display: block;
 	height: 25px;
@@ -849,13 +887,14 @@
 .instreet-plugin-control .ins-share .ins-bubble{
 	width: 105px;
 	left: -40px;
+	line-height: 10px;
 }
 .instreet-plugin-control .ins-share .ins-bubble dd a{
-	background: url(../images/metro_share.png) no-repeat;
+	background: url(../images/metro/metro_share.png) no-repeat;
 	display: inline-block;
 	width: 17px;
 	height: 18px;
-	margin-right: 5px;
+	margin:0 2px;
 }
 .instreet-plugin-control .ins-share .ins-bubble dd a.ins-share-sina{
 	background-position: 0 -102px;

@@ -32,6 +32,7 @@
    themeList=['red','yellow','green','blue','purple','brown'],
    firstImage=true,
    prefix="http://monkey.instreet.cn/",
+   // prefix="http://push.instreet.cn/",
    container;
 
 
@@ -46,26 +47,25 @@
 			iurl    :	prefix+"tracker90.action",
 			ourl	:	prefix+"loadImage.action",
 			surl    :   prefix+"share/weiboshare",	
-			// cssurl 	:	"http://static.instreet.cn/widgets/push/css/instreet.ifeng.min.css",
-			cssurl  :   "css/instreet.metro.css",				
+			cssurl 	:	"css/instreet.metro.css",				
 			imih	:	300,
 			imiw	:	300,
 			timer   :   2000,
 			sizeNum : 	0	//0为250*250 1为200*200 2为300*250
-			,
-			adsLimit :  3,
-			// widgetSid:"77WCO3MnOq5GgvoFH0fbH2",
-			widgetSid:"27YkzLdd7nCQH5vGOScA2Q",
-			showAd:true,
-			showFootAd:true,
-			showWeibo:true,
-			showWiki:true,
-			showShareButton:true,
-			showWeather:true,
-			showNews:true,
-			showMeiding  :true,
-			footAuto:  true,
-			position: 0       //0为right 1为left
+			// ,
+			// adsLimit :  3,
+			// // widgetSid:"77WCO3MnOq5GgvoFH0fbH2",
+			// widgetSid:"27YkzLdd7nCQH5vGOScA2Q",
+			// showAd:true,
+			// showFootAd:true,
+			// showWeibo:true,
+			// showWiki:true,
+			// showShareButton:true,
+			// showWeather:true,
+			// showNews:true,
+			// showMeiding  :true,
+			// footAuto:  true,
+			// position: 0       //0为right 1为left
 
 	};
 
@@ -334,8 +334,7 @@
 			 	if(typeof opt.old=="function"){
 			 		opt.old.call(this);
 			 	}
-			 }
-
+			 };
 
 	 		 opt.duration=typeof opt.duration=="number"?opt.duration:400;
 	 		 opt.easing=typeof opt.easing=="string"?opt.easing:"swing";
@@ -558,8 +557,8 @@
 		    	return document.createElement(tag);	
 		    },
 		    importFile  :function(type,name){
-				 var link,script
-				 head=document.head || document.getElementsByTagName( "head" )[0] || document.documentElement;;
+				 var link,script,
+				 head=document.head || document.getElementsByTagName( "head" )[0] || document.documentElement;
 				 switch(type){
 				   case "js": 
 				   script=U.createElem('script');
@@ -740,9 +739,11 @@
 			U.setCookie('instreet_theme',theme,7);
 			for(var i in adsObjectArray){
 				var ad=adsObjectArray[i];
-				if(ad.box&&ad.box.firstChild){
-					ad.box.firstChild.className="ins-wrapper ins-"+themeList[theme]+"style ins-size"+sizeList[config.sizeNum*2];
+				if(ad.box&&ad.box.lastChild){
+					ad.box.lastChild.className="ins-wrapper ins-"+themeList[theme]+"style ins-size"+sizeList[config.sizeNum*2];
 					ad.controlBox.firstChild.className="ins-"+themeList[theme]+"style";
+					// 调整关闭按钮
+					ad.close.className='ins-btn-close ins-btn-'+themeList[theme]+'style';
 					// 调整footer的themelist
 					var footer=ad.footer;
 					var selected=U.$$(footer,'selected')[0];
@@ -793,16 +794,19 @@
 				control.innerHTML=str;
 				theme.appendChild(control);
 				// 事件处理函数
+		
 				var overHandler = function(e){
 					var event=U.getEvent(e),rel=U.getRelatedTarget(event);	
-					if(!this.contains(rel)){								
+					if(!this.contains(rel)){	
+						this.timer&&clearTimeout(this.timer);					
 						Animate(this.lastChild).stop().fadeIn();
 					}
 				};
 				var outHandler = function(e){
 					var event=U.getEvent(e),rel=U.getRelatedTarget(event);
 					if(!this.contains(rel)){
-						Animate(this.lastChild).stop().fadeOut();
+						var btn=this;	
+						btn.timer=setTimeout(function(){Animate(btn.lastChild).fadeOut()},500);
 					}
 				};
 				// 根据配置控制是否显示分享按钮
@@ -852,29 +856,23 @@
 				U.bind(control.firstChild,'click',function(){
 					var p=control.getElementsByTagName('p')[0];
 					if(_.isOn==true){
-						InstreetAd.slideIn(_.box);
+						InstreetAd.slideIn(_);
 						_.isOn=false;
 						p.innerHTML='尚街已关闭';
-						Animate(this).animate({opacity:0.7});
-						if(share){
-							css.set(share.firstChild,'display','none');
-						}
+
 					}else{
-						InstreetAd.slideOut(_.box);
+						InstreetAd.slideOut(_);
 						_.isOn=true;
-						p.innerHTML='尚街已开启'
-						Animate(this).animate({opacity:1});
-						if(share){
-							css.set(share.firstChild,'display','block');
-						}
+						p.innerHTML='尚街已开启';
 						_.recordShow(9);  //记录1次广告展示
 					}
 				});
 
 			},
 			createContainer :function () {
-				var _=this,w=sizeList[config.sizeNum*2]
+				var _=this,w=sizeList[config.sizeNum*2],
 					box=U.createElem('div'),
+					close=U.createElem('a'),
 				    wrapper=U.createElem('div'),
 				    fragment=document.createDocumentFragment(),
 				    line=U.createElem('div'),
@@ -883,9 +881,13 @@
 				    content=U.createElem('div'),
 				    footer=_.createFooter();
 				box.className="instreet-plugin-box";
+				close.className='ins-btn-close ins-btn-'+themeList[config.theme]+'style';
+				close.href='javascript:;';close.title='关闭广告';
+				close.innerHTML='×';
 				wrapper.className="ins-wrapper ins-"+themeList[config.theme]+"style ins-size"+w;
 				css.set(box,'visibility','hidden');
 				css.set(wrapper,'width',0);
+				css.set(close,'display','none');
 				line.className="ins-colorline clearfix";
 				borderBox.className="ins-borderbox";
 				nav.className="ins-main-nav";
@@ -894,9 +896,11 @@
 				
 				borderBox.appendChild(fragment);
 				wrapper.appendChild(borderBox);
+				box.appendChild(close);
 				box.appendChild(wrapper);
 				_.container.appendChild(box);
 				// 添加属性
+				_.close=close;
 				_.nav=nav;
 				_.content=content;
 				_.footer=footer;
@@ -920,10 +924,8 @@
 					if(!_.isOn){
 						return;
 					}
-					_.recordShow(10) //记录鼠标mouseover到图片的行为
-					Animate(_.control.firstChild).fadeIn();
-					_.share&&Animate(_.share.firstChild).fadeIn();
-					InstreetAd.slideOut(box);
+					_.recordShow(10) ;//记录鼠标mouseover到图片的行为
+					InstreetAd.slideOut(_);
 
 				},
 				outHandler = function(){
@@ -931,12 +933,11 @@
 						return;
 					}
 					timer = setTimeout(function(){
-						Animate(_.control.firstChild).animate({opacity:0.7});
-						_.share&&Animate(_.share.firstChild).fadeOut();InstreetAd.slideIn(box);
+						InstreetAd.slideIn(_);
 					},config.timer);
 
 				};
-
+				// 创建apps
 				for(var i in InstreetAd.apps){
 					InstreetAd.apps[i]&&InstreetAd.apps[i](_);
 				}
@@ -948,6 +949,8 @@
 				// 为plugin-box绑定mouseover、mouseout事件
 				U.bind(_.box,'mouseover',overHandler);
 				U.bind(_.box,'mouseout',outHandler);
+				// 关闭按钮点击事件
+				U.bind(_.close,'click',function(){InstreetAd.slideIn(_)});
 				// 统计鼠标mouseover到广告内容的行为
 				_.content.onmouseover = function(e){
 					var event=U.getEvent(e),rel=U.getRelatedTarget(event);
@@ -999,7 +1002,7 @@
 			createFooter : function(){
 				var _=this,footer=U.createElem('div'),list=footer.getElementsByTagName('li');
 				footer.className="ins-footer";
-				footer.innerHTML='<div>powered by <a target="_blank" href="#">instreet</a><ul class="theme-list"><li><a class="red" index="0" href="javascript:;"></a></li><li><a class="yellow" index="1" href="javascript:;"></a></li><li><a class="green" index="2" href="javascript:;"></a></li><li><a class="blue" index="3" href="javascript:;"></a></li><li><a class="purple" index="4" href="javascript:;"></a></li><li><a class="brown" index="5" href="javascript:;"></a></li></ul></div>'
+				footer.innerHTML='<div>powered by <a target="_blank" href="http://www.instreet.cn" title="尚街网">instreet</a><ul class="theme-list"><li><a class="red" index="0" href="javascript:;"></a></li><li><a class="yellow" index="1" href="javascript:;"></a></li><li><a class="green" index="2" href="javascript:;"></a></li><li><a class="blue" index="3" href="javascript:;"></a></li><li><a class="purple" index="4" href="javascript:;"></a></li><li><a class="brown" index="5" href="javascript:;"></a></li></ul></div>';
 				list[config.theme].className="selected";
 				// 为li绑定点击事件
 				footer.onclick=function(e){
@@ -1038,7 +1041,7 @@
 						css.set(_.box,{'top':top,'right':right,'left':'auto'});
 						css.set(_.box.lastChild.lastChild,{left:0,right:'auto'});
 					}else{
-						var left=(pos.x+img.offsetWidth)+"px"
+						var left=(pos.x+img.offsetWidth)+"px";
 						css.set(_.box,{'top':top,'left':left,'right':'auto'});
 						css.set(_.box.lastChild.lastChild,{left:'auto',right:0});
 					}
@@ -1054,8 +1057,8 @@
 					
 					// 自动展示广告
 					if(config.footAuto&&_.isFirstShow){
-						_.recordShow(9)	//记录广告展示
-						InstreetAd.slideOut(_.box);
+						_.recordShow(9);	//记录广告展示
+						InstreetAd.slideOut(_);
 						_.isFirstShow=false;
 					}
 											
@@ -1114,11 +1117,11 @@
 					}else if(selected.className.indexOf('shop-item')!=-1){	//折扣
 		
 						index=_.getSelectedIndex();
-						var app=data.adsSpot[index]
+						var app=data.adsSpot[index];
 						adsId=app.adsId;
 						adsType=app.adsType;						
 						mx=app.metrix;
-					}else if(tag==9){ //如果展示的不是推广或者折扣并且flag==9，退出
+					}else if(flag==9){ //如果展示的不是推广或者折扣并且flag==9，退出
 						return;
 					}
 				}else if(flag==9){  //如果没有应用被展示则不记录广告展示
@@ -1182,19 +1185,22 @@
 		});
 		
 
-		InstreetAd.slideOut = function(box){
+		InstreetAd.slideOut = function(obj){
 
-			var wrapper=box.lastChild,borderbox=wrapper.lastChild,w=parseFloat(css.get(wrapper,'width')),W=css.get(borderbox,'width'),H=css.get(borderbox,'height');
-
+			var _=obj,box=_.box,wrapper=box.lastChild,borderbox=wrapper.lastChild,w=parseFloat(css.get(wrapper,'width')),W=css.get(borderbox,'width'),H=css.get(borderbox,'height');
+			Animate(_.control.firstChild).fadeIn();
+			_.share&&Animate(_.share.firstChild).fadeIn();
 			if(w<=0){
 				css.set(wrapper,'height',H);
-				Animate(wrapper).animate({width:W},300);
+				Animate(wrapper).animate({width:W},300,function(){css.set(box.firstChild,'display','block')});
 			}
 
 		};
-		InstreetAd.slideIn = function(box){
-			var wrapper=box.lastChild;
-			Animate(wrapper).animate({width:0});
+		InstreetAd.slideIn = function(obj){
+			var _=obj,box=_.box,wrapper=box.lastChild;
+			Animate(_.control.firstChild).animate({opacity:0.7});
+			_.share&&Animate(_.share.firstChild).fadeOut();
+			Animate(wrapper).animate({width:0},function(){css.set(box.firstChild,'display','none')});
 
 		};
 
@@ -1259,7 +1265,7 @@
 					imgUrl=app.adsPicUrl.replace("160x160",sizeList[config.sizeNum*2]+"x"+sizeList[config.sizeNum*2]);
 					
 					album.className="product-album";album.target="_blank";album.href=redUrl;
-					album.innerHTML='<img alt="'+title+'" src="'+imgUrl+'"><span class="product-info"><em class="price">￥'+price+'</em><em class="name">'+title+'</em><em class="nick">'+nick+'</em>'
+					album.innerHTML='<img alt="'+title+'" src="'+imgUrl+'"><span class="product-info"><em class="price">￥'+price+'</em><em class="name">'+title+'</em><em class="nick">'+nick+'</em>';
 					if(len>1){
 						slider.innerHTML+='<li class="switch-trigger" index="'+i+'"></li>';
 					}
@@ -1381,7 +1387,19 @@
 			setTimeout(loop,400);
 
 		};
+		// mix config 对象
+		var mixConfig=function(c){
+		   if(c&&typeof c=="object"){
 
+		     for(var i in c){
+			    config[i]=c[i];
+			 }
+		   
+		   }else{
+		     return;		   
+		   }
+		
+		};
 		//插件初始化
 		var init=function(){
 			// 引入css文件
@@ -1410,6 +1428,9 @@
 
 		// 执行init方法
 		domReady(function () {
+			if(typeof instreet_config!="undefined"){		//mix配置信息
+			 	mixConfig(instreet_config);
+	     	} 
 			init();
 		});
 })(window);
