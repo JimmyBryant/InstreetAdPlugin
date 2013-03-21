@@ -709,6 +709,7 @@
 }
 .instreet-plugin-box .ins-bluestyle .ins-footer{
 	background-color: #5F90B0;
+	text-align: left;
 }
 .instreet-plugin-box .ins-bluestyle .price,.instreet-plugin-box .ins-bluestyle .nick:hover{
 	color: #5F90B0;

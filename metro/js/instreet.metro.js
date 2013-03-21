@@ -1,8 +1,12 @@
 /*
-	instreet.metro.js v0.1.0
+	instreet.metro.js v0.1.1
 
 	metro风格的js广告插件
 	支持自定义主题
+
+	+	增加关闭按钮
+	m	优化分享按钮
+	m   优化广告框定位
 */
 
 (function (window,undefined) {
@@ -47,6 +51,7 @@
 			iurl    :	prefix+"tracker90.action",
 			ourl	:	prefix+"loadImage.action",
 			surl    :   prefix+"share/weiboshare",	
+			// cssurl 	:	"http://static.instreet.cn/widgets/push/css/instreet.metro.min.css",
 			cssurl 	:	"css/instreet.metro.css",				
 			imih	:	300,
 			imiw	:	300,
@@ -643,10 +648,20 @@
 		    if(data){
 			  var index=data.index,img=imagesList[index];
 			  img.setAttribute('instreet_data_ready',true);
+			  removeOldDom(index);
 			  var ad=new InstreetAd(data,container);
 			  adsObjectArray[index]=ad;
 			}
 				
+		};
+
+		// 移除旧的InstreetAd对象的dom元素
+		var removeOldDom = function(index){
+			if(adsObjectArray[index]){
+				var _=adsObjectArray[index],parent=_.box.parentNode;
+				parent&&parent.removeChild(_.box);
+				parent&&parent.removeChild(_.controlBox);
+			}
 		};
 
     	
@@ -986,8 +1001,8 @@
 								next.className+=" content-item-selected";
 								css.set(next,{'opacity':1});
 								css.set(wrapper,'height',css.get(borderbox,'height'));
-							})
-
+								_.recordShow(9); //记录广告展现
+							});							
 						},200);
 
 					}	
@@ -1045,7 +1060,7 @@
 						css.set(_.box,{'top':top,'left':left,'right':'auto'});
 						css.set(_.box.lastChild.lastChild,{left:'auto',right:0});
 					}
-					if(U.isVisible(img)){
+					if(U.isVisible(img)&&img.clientWidth>=config.imiw&&img.clientHeight>=config.imih){
 						// 定位control
 						css.set(_.controlBox,{top:(pos.y+5)+'px',left:(pos.x+5)+'px','display':'block'});
 						// 显示instreet-plugin-box
@@ -1079,22 +1094,24 @@
         			for(var i=images.length;i--;){
 
         				if(images[i].src==img.src&&images[i].clientWidth>=config.imiw&&images[i].clientHeight>=config.imih){
-
         					_.image=images[i];
         					_.locate();
         					break;
         				}
         			}
+        		}else if(typeof img.src!="undefined"&&img.src!=info.src){  //幻灯片，图片src发生变化
+   
+        			info.src=img.src;
+        			removeOldDom(_.insIndex);
+        			typeof config.adsLimit=='number'&&config.adsLimit++;
+					requestAdsData(img);										
+				 
         		}else if(pos.x!==info.x||pos.y!==info.y||scrollTop!==info.scrollTop||img.clientWidth!==info.width||img.clientHeight!==info.height){	   //图片位置或者尺寸发生变化					
 					
 					_.locate();
 
 
-				}else if(typeof img.src!="undefined"&&img.src!=info.src){  //幻灯片，图片src发生变化
-
-					requestAdsData(img);										
-
-				} 
+				}
 			},
    		   recordShow : function(flag){  //统计广告展示次数
    		   		// flag为10表示鼠标mouseover到图片
@@ -1107,7 +1124,7 @@
 					return;
 
 				var selected=U.$$(_.content,'content-item-selected')[0];
-				if(selected){
+				if(selected){	
 					if(selected.className.indexOf('ad-item')!=-1){	//推广
 						var app=data.badsSpot[0]; 
 						adsId=app.adsId;

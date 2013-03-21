@@ -1,9 +1,11 @@
 /*********************************************
 *
-* instreet.sprint.js
+* instreet.sprint.js v0.1.1
 *
-* 1.将推广内容的位置提升到折扣内容前
-* 2.新闻链接添加imageUrlHash
+* +	300*250尺寸
+* + 红色主题
+* m 去ins图标 
+* m 修复幻灯片下定位bug
 *
 **********************************************/
 (function(window,undefined){
@@ -26,8 +28,8 @@
 		   imgs=[],
 	       readylist=[],
 		   isFirst=true,
-		   sizeList=[250,250,200,200],
-		   cssList=["css/instreet.sprint.css",
+		   sizeList=[250,250,200,200,300,250],
+		   cssList=["css/instreet.sprint.min.css",
 		   "http://static.instreet.cn/widgets/push/css/instreet.sprint200.min.css"];
 
 
@@ -44,23 +46,8 @@
 						surl    :   prefix+"share/weiboshare",					
 						imih	:	290,
 						imiw	:	290,
-						timer   :   1000
-						,
-						adsLimit :  3,
-						// widgetSid:"77WCO3MnOq5GgvoFH0fbH2",
-						widgetSid:"27YkzLdd7nCQH5vGOScA2Q",
-						showAd:true,
-						showFootAd:true,
-						showWeibo:true,
-						showWiki:true,
-						showShareButton:true,
-						showWeather:true,
-						showNews:true,
-						showMeiding  :true,
-						footAuto:  true,
-						sizeNum : 0	,      //0为250*250 1为200*200
-						position: 0       //0为right 1为left
-
+						timer   :   1000,
+						sizeNum : 0	     //0为250*250 1为200*200 2为300*250
 		};
 
 
@@ -515,7 +502,7 @@
 					   obj.onload=null;
 					   cache.loadData(image);  
 					 }				 
-			     }
+			    }
 		    },
 			loadData     :function(img){
 			   var index=img.insId,clientImg=imgs[index];		   
@@ -548,10 +535,27 @@
 			  var index=data.index,img=imgs[index];
 			  img.setAttribute('instreet_data_ready',true);
 			  var ad=new InstreetAd(data,instreet.container);
+			  removeOld(index); //删除旧的dom对象
 			  cache.adsArray[index]=ad;
 			  InstreetAd.autoShow(ad);
 			}
 				
+		};
+		// 移除旧的dom对象
+		var removeOld = function(index){
+
+			var insAd=cache.adsArray[index];
+			if(insAd&&insAd.adWrapper){
+				var ad=insAd.adWrapper,
+	                parent=ad.parentNode;
+                parent&&parent.removeChild(ad); 
+                // 移除spots
+                for(var i=0,len=insAd.spotsArray.length;i<len;i++){
+                	var p=insAd.spotsArray[i].parentNode;
+                	p&&p.removeChild(insAd.spotsArray[i]);
+                } 
+			}
+
 		};
 
 		/***************************************
@@ -560,7 +564,12 @@
 		var instreet={
 
 			init :function(){
-				var cssurl=cssList[config.sizeNum];
+				if(config.sizeNum==2){
+					var cssurl=cssList[0];
+				}
+				else{
+					var cssurl=cssList[config.sizeNum];
+				}	
 				ev.importFile('css',cssurl);
 				instreet.createContainer();
 			},
@@ -615,9 +624,12 @@
 				contentWrapper=document.createElement("ul");
 				//根据Position为容器定义不同的class
 				if(config.position==0){
-					adWrapper.className="in-ad-wrapper in-redstyle in-position-right";
+					adWrapper.className="in-ad-wrapper in-redstyle  in-position-right";
 				}else if(config.position==1){
-					adWrapper.className="in-ad-wrapper in-position-left";
+					adWrapper.className="in-ad-wrapper in-redstyle  in-position-left";
+				}
+				if(config.sizeNum==2){
+					adWrapper.className+=" in-size300"
 				}
 				tabWrapper.className="in-tabs-wrapper";
 				contentWrapper.className="in-contents-wrapper";
@@ -669,13 +681,49 @@
 				,right=!!window.ActiveXObject?(document.body.offsetWidth-pos.x)+"px":(document.documentElement.offsetWidth-pos.x)+"px"
 				,top=pos.y+"px",spotsArray=_this.spotsArray;
 
+				var slideLeft=_this.isSlideLeft();
+
 				var dis=img.clientWidth>=config.imiw&&img.clientHeight>=config.imih?"block":"none";
-				if(config.position==0){
-					_this.adWrapper.style.left=left;
-				}
-			    else if(config.position==1){
-			   	    _this.adWrapper.style.right=right;
+
+				function setFloat(direction){
+						if(isIE){
+							_this.tabs.style.styleFloat=direction;
+							_this.contents.style.styleFloat=direction;
+						}else{
+							_this.tabs.style.cssFloat=direction;
+							_this.contents.style.cssFloat=direction;
+						}
+				};
+				if(config.position==0){            //图片右侧
+					if(slideLeft){
+						setFloat("right");						
+						_this.contents.className="in-contents-wrapper in-contents-slideleft";
+						_this.adWrapper.style.left="auto";
+						_this.adWrapper.style.right=(Math.max(document.body.clientWidth,document.documentElement.clientWidth)-pos.x-w-26)+"px";
+					}else{
+						setFloat("left");
+						_this.contents.className="in-contents-wrapper";										
+						_this.adWrapper.style.right="auto";
+						_this.adWrapper.style.left=left;
+					}
+				}else if(config.position==1){		//图片左侧
+
+					if(slideLeft){
+						setFloat("right");
+						_this.contents.className="in-contents-wrapper";	
+						_this.adWrapper.style.right=right;
+						_this.adWrapper.style.left="auto";
+
+					}else{
+						setFloat("left");
+						_this.contents.className="in-contents-wrapper in-contents-slideright";
+						_this.adWrapper.style.left=(pos.x-26)+"px";
+						_this.adWrapper.style.right="auto";
+
+					}
+			   	    
 			    }
+
 				_this.adWrapper.style.top=top;
 				_this.adWrapper.style.display=dis;
 				// _this.adWrapper.style.cssText="left:"+left+";top:"+top+";display:"+dis;
@@ -721,6 +769,10 @@
 					var event=ev.getEvent(e),tar=ev.getTarget(event);
 					if(tar.className=='in-close'){
 						_this.closeApp();
+						//防止广告在图片上不能关闭
+						if(config.position==0&&_this.isLeft||config.position==1&&!_this.isLeft){
+							_this.notopen=true;
+						}
 					}else if(tar.parentNode.className=="in-share-icons"){
 						_this.shareImg(tar);
 					}
@@ -830,6 +882,9 @@
 				//img mouseover
 				ev.bind(img,'mouseover',function(){
 					clearTimeout(_this.timerId);
+					if(_this.notopen){
+						return;
+					}
 					if(_this.contents.offsetWidth==0){
 						_this.showApp();
 						_this.recordShow(10);
@@ -838,6 +893,7 @@
 				//img mouseout
 				ev.bind(img,'mouseout',function(){
  					_this.timerId=setTimeout(function(){_this.closeApp()},config.timer);
+ 					_this.notopen=false;        //image mouseout时记得false该属性
 				});
 			},
 
@@ -866,14 +922,17 @@
 				this.contents.style.width=0;
 			},
 			showApp: function(tab){   
-				var _this=this,list=_this.tabs.children,type,app,width;        
+				var _this=this,list=_this.tabs.children,type,app,width;
+				if(list.length==0){
+					return;
+				}        
 				if(!tab){
 					tab=list[0];
 				}				
 				type=tab.lastChild.className;
 				_this.hideApps();
 				if(_this.adWrapper.style.width=="auto"){
-					_this.adWrapper.style.width=config.sizeNum==1?"242px":"292px";
+					_this.adWrapper.style.width=config.sizeNum==1?"242px":config.sizeNum==2?"342px":"292px";
 				}
 				tab.className+=" focus";
 				//如果是IE用display:block来显示应用
@@ -934,18 +993,30 @@
 			    }
 			    ev.importFile('js',recordUrl);     //记录分享行为
 			},
+			isSlideLeft    :function(){						//获取广告slide方向
+				var img=this.img,pos=ev.getXY(img),w=sizeList[config.sizeNum*2]+42;
+				//判断广告内容显示在图片左侧或者右侧
+				if(config.position==0){
+					this.isLeft=pos.x+img.offsetWidth+w>(Math.max(document.body.clientWidth,document.documentElement.clientWidth))?true:false;
+				}else if(config.position==1){
+					this.isLeft=w<=pos.x?true:false;
+				}
+				return this.isLeft;    
+			},
 			detect   :function(){                     //每隔一段时间开始检测图片对象是否change
 
                 var _this=this,img=_this.img,origin=_this.originInfo,
-                	side=_this.sideWrapper,pos=ev.getXY(img);
+                	ad=_this.adWrapper,pos=ev.getXY(img);
 
                 if(img.src&&img.src!=origin.src){          //针对幻灯片
-                    var parent=side.parentNode||document.body;
-                    parent.removeChild(side);
-                    cache.onImgLoad(img);
-                    origin.src=img.src;
-                }
-                else if(img.clientWidth<=0||img.clientHeight<=0){   //针对原图被删除或者display为none的情况              		
+
+                    removeOld(img.insId); //删除旧的dom对象
+                	isFirst=true;
+                	origin.src=img.src;
+  					typeof config.adsLimit=='number'&&config.adsLimit++;                      
+                    cache.onImgLoad(img);            
+                
+                }else if(img.clientWidth<=0||img.clientHeight<=0){   //针对原图被删除或者display为none的情况              		
         			var images=document.images;
         			for(var i=images.length;i--;){
         				if(images[i].src==img.src&&images[i].clientWidth>=config.imiw&&images[i].clientHeight>=config.imih){
@@ -965,8 +1036,6 @@
 
                 }else if(!ev.isVisible(img)&&_this.adWrapper.style.display!="none"){  //图片被隐藏
                 	hide(_this.adWrapper);
-                }else if(ev.isVisible(img)&&_this.adWrapper.style.display=="none"){
-					show(_this.adWrapper);
                 }
                 
 			},
@@ -1148,8 +1217,8 @@
 			  	  str+='<a class="flash-cover" href="'+redUrl+'" target="_blank"></a>';
 			  	}
 			  	else if(!app.adsLinkUrl&&app.description){   //谷歌广告
-				  var frame='<iframe src="'+app.description+'" scrolling="no" height="'+app.adsHeight+'" width="'+app.adsWidth+'" frameborder="0" border="0" marginwidth="0" marginheight="0"></iframe>';
-				  str+='<i class="small-info"></i>'+frame;
+				  str+='<iframe src="'+app.description+'" scrolling="no" height="'+app.adsHeight+'" width="'+app.adsWidth+'" frameborder="0" border="0" marginwidth="0" marginheight="0"></iframe>';
+				  // str+='<i class="small-info"></i>'+frame;
 			    }
 	 			str+='</div>';	
 	 			cont.innerHTML=str;
@@ -1256,7 +1325,7 @@
 			newsApp:function(obj){
 				if(!config.showNews)
 					return;
-				var tab,cont,data=obj.data,w=sizeList[config.sizeNum*2],
+				var tab,cont,data=obj.data,w=sizeList[config.sizeNum*2],h=sizeList[config.sizeNum*2+1],
 				    newsUrl=prefix+"news?size="+w+"&pd="+data.widgetSid+"&muh="+data.imageUrlHash;
 
 				if(obj.isFirstApp){
@@ -1269,7 +1338,7 @@
    			   	var cont=document.createElement("li");			   	   	   
 		   	    cont.className="news";  
 		        str='<h3 class="title clearfix"><a title="关闭" href="javascript:;" class="in-close">×</a>热点新闻</h3><div class="main-cont">';
-			    str+='<iframe name="weather_inc" src="'+newsUrl+'" width="'+w+'" height="'+w+'" frameborder="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>';
+			    str+='<iframe name="weather_inc" src="'+newsUrl+'" width="'+w+'" height="'+h+'" frameborder="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>';
 			    str+='</div>';
 		   	    cont.innerHTML=str;
 			   
