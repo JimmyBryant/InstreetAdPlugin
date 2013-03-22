@@ -1044,7 +1044,17 @@
 					var img=_.image,pos=U.getXY(img),w=sizeList[config.sizeNum*2]+18,h=parseFloat(css.get(_.box,'height')),top=pos.y+"px",maxTop=pos.y+img.clientHeight-h,
 					W=Math.max(document.body.clientWidth,document.documentElement.clientWidth),scrollTop=window.pageYOffset||document.documentElement.scrollTop||0;
 					_.imageInfo={width:img.clientWidth,height:img.clientHeight,x:pos.x,y:pos.y,scrollTop:scrollTop,src:img.src};
-
+					//判断是否显示广告框
+					if(U.isVisible(img)&&img.clientWidth>=config.imiw&&img.clientHeight>=config.imih){
+						// 定位control
+						css.set(_.controlBox,{top:(pos.y+5)+'px',left:(pos.x+5)+'px','display':'block'});
+						// 显示instreet-plugin-box
+						css.set(_.box,'visibility','visible');
+					}else{
+						css.set(_.controlBox,'display','none');
+						css.set(_.box,'visibility','hidden');
+					}
+					// 定位
 					if(scrollTop>maxTop){
 						top=maxTop+"px";
 					}else if(pos.y<scrollTop&&scrollTop<=maxTop){
@@ -1060,15 +1070,6 @@
 						css.set(_.box,{'top':top,'left':left,'right':'auto'});
 						css.set(_.box.lastChild.lastChild,{left:'auto',right:0});
 					}
-					if(U.isVisible(img)&&img.clientWidth>=config.imiw&&img.clientHeight>=config.imih){
-						// 定位control
-						css.set(_.controlBox,{top:(pos.y+5)+'px',left:(pos.x+5)+'px','display':'block'});
-						// 显示instreet-plugin-box
-						css.set(_.box,'visibility','visible');
-					}else{
-						css.set(_.controlBox,'display','none');
-						css.set(_.box,'visibility','hidden');
-					}
 					
 					// 自动展示广告
 					if(config.footAuto&&_.isFirstShow){
@@ -1083,12 +1084,12 @@
 			},
 			checkLocation : function(){		//检察位置是否正确
 
-				var _=this,img=_.image,pos=U.getXY(img),info=_.imageInfo,scrollTop=window.pageYOffset||document.documentElement.scrollTop||0;;
+				var _=this,img=_.image,pos=U.getXY(img),info=_.imageInfo,scrollTop=window.pageYOffset||document.documentElement.scrollTop||0;
 
 				if(typeof info=="undefined"){
 					return;
 				}
-				
+
 				if(img.clientWidth<=0||img.clientHeight<=0){   //针对原图被删除或者display为none的情况              		
         			var images=document.images;
         			for(var i=images.length;i--;){
@@ -1096,9 +1097,10 @@
         				if(images[i].src==img.src&&images[i].clientWidth>=config.imiw&&images[i].clientHeight>=config.imih){
         					_.image=images[i];
         					_.locate();
-        					break;
+        					return;
         				}
         			}
+        			_.locate();
         		}else if(typeof img.src!="undefined"&&img.src!=info.src){  //幻灯片，图片src发生变化
    
         			info.src=img.src;
@@ -1109,7 +1111,6 @@
         		}else if(pos.x!==info.x||pos.y!==info.y||scrollTop!==info.scrollTop||img.clientWidth!==info.width||img.clientHeight!==info.height){	   //图片位置或者尺寸发生变化					
 					
 					_.locate();
-
 
 				}
 			},
