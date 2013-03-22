@@ -6,7 +6,7 @@
 
 	+	增加关闭按钮
 	m	优化分享按钮
-	m   优化广告框定位
+	m   优化广告定位
 */
 
 (function (window,undefined) {
@@ -35,8 +35,8 @@
    sizeList=[250,250],   //广告尺寸数组，w=config.sizeNum*2 ,h=config.sizeNum*2+1
    themeList=['red','yellow','green','blue','purple','brown'],
    firstImage=true,
-   prefix="http://monkey.instreet.cn/",
-   // prefix="http://push.instreet.cn/",
+   // prefix="http://monkey.instreet.cn/",
+   prefix="http://push.instreet.cn/",
    container;
 
 
@@ -51,8 +51,8 @@
 			iurl    :	prefix+"tracker90.action",
 			ourl	:	prefix+"loadImage.action",
 			surl    :   prefix+"share/weiboshare",	
-			// cssurl 	:	"http://static.instreet.cn/widgets/push/css/instreet.metro.min.css",
-			cssurl 	:	"css/instreet.metro.css",				
+			cssurl 	:	"http://static.instreet.cn/widgets/push/css/instreet.metro.min.css",
+			// cssurl 	:	"css/instreet.metro.css",				
 			imih	:	300,
 			imiw	:	300,
 			timer   :   2000,
@@ -563,7 +563,7 @@
 		    },
 		    importFile  :function(type,name){
 				 var link,script,
-				 head=document.head || document.getElementsByTagName( "head" )[0] || document.documentElement;
+				 head=document.getElementsByTagName( "head" )[0] || document.documentElement;
 				 switch(type){
 				   case "js": 
 				   script=U.createElem('script');
@@ -797,6 +797,7 @@
 				_.createContainer();
 				_.createApps();			
 				_.locate();
+			    U.bind(window,'resize',function(){_.locate();});
 			},
 			createController : function(){		//创建controller按钮
 				var _=this,box=U.createElem('div'),theme=U.createElem('div'),
