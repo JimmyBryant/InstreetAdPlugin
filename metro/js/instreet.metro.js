@@ -1,12 +1,11 @@
 /*
-	instreet.metro.js v0.1.1
+	instreet.metro.js v0.0.2
 
 	metro风格的js广告插件
 	支持自定义主题
 
-	+	增加关闭按钮
-	m	优化分享按钮
-	m   优化广告定位
+	+ 可以设置广告展现在图片上或者图片外侧
+	  @outPosition 0 自动 1 图片上 2 图片外
 */
 
 (function (window,undefined) {
@@ -35,8 +34,8 @@
    sizeList=[250,250],   //广告尺寸数组，w=config.sizeNum*2 ,h=config.sizeNum*2+1
    themeList=['red','yellow','green','blue','purple','brown'],
    firstImage=true,
-   // prefix="http://monkey.instreet.cn/",
    prefix="http://push.instreet.cn/",
+   // prefix="http://monkey.instreet.cn/",
    container;
 
 
@@ -685,7 +684,7 @@
 			var loadImage = function(img,callback){
 
 				 var image=new Image();
-				 if(typeof image.src=="undefined")        //没有src属性则退出
+				 if(typeof img.src=="undefined")        //没有src属性则退出
 				 	return;
 				 image.src=img.src;
 				 image.ins_index=img.ins_index;
@@ -1018,7 +1017,7 @@
 			createFooter : function(){
 				var _=this,footer=U.createElem('div'),list=footer.getElementsByTagName('li');
 				footer.className="ins-footer";
-				footer.innerHTML='<div>powered by <a target="_blank" href="http://www.instreet.cn" title="尚街网">instreet</a><ul class="theme-list"><li><a class="red" index="0" href="javascript:;"></a></li><li><a class="yellow" index="1" href="javascript:;"></a></li><li><a class="green" index="2" href="javascript:;"></a></li><li><a class="blue" index="3" href="javascript:;"></a></li><li><a class="purple" index="4" href="javascript:;"></a></li><li><a class="brown" index="5" href="javascript:;"></a></li></ul></div>';
+				footer.innerHTML='<div>Powered by <a target="_blank" href="http://www.instreet.cn" title="尚街网">Instreet</a><ul class="theme-list"><li><a class="red" index="0" href="javascript:;"></a></li><li><a class="yellow" index="1" href="javascript:;"></a></li><li><a class="green" index="2" href="javascript:;"></a></li><li><a class="blue" index="3" href="javascript:;"></a></li><li><a class="purple" index="4" href="javascript:;"></a></li><li><a class="brown" index="5" href="javascript:;"></a></li></ul></div>';
 				list[config.theme].className="selected";
 				// 为li绑定点击事件
 				footer.onclick=function(e){
@@ -1061,15 +1060,28 @@
 					}else if(pos.y<scrollTop&&scrollTop<=maxTop){
 						top=scrollTop+"px";
 					}
-					// 判断图片右侧空间是否充足
-					if(W<(pos.x+img.clientWidth+w)){
+					// 设置广告显示在图片上还是图片外侧
+					var setInner = function(){
 						var right=(W-pos.x-img.clientWidth)+"px";						
 						css.set(_.box,{'top':top,'right':right,'left':'auto'});
 						css.set(_.box.lastChild.lastChild,{left:0,right:'auto'});
-					}else{
+					};
+					var setOut = function(){
 						var left=(pos.x+img.offsetWidth)+"px";
 						css.set(_.box,{'top':top,'left':left,'right':'auto'});
 						css.set(_.box.lastChild.lastChild,{left:'auto',right:0});
+					};
+					if(config.outPosition==1){
+						setInner();
+					}else if(config.outPosition==2){
+						setOut(); 
+					}else{
+						// 判断图片右侧空间是否充足
+						if(W<(pos.x+img.clientWidth+w)){
+							setInner();
+						}else{
+							setOut();
+						}
 					}
 					
 					// 自动展示广告
@@ -1210,6 +1222,7 @@
 			Animate(_.control.firstChild).fadeIn();
 			_.share&&Animate(_.share.firstChild).fadeIn();
 			if(w<=0){
+				//必须给容器设置高度，否则广告无法显示
 				css.set(wrapper,'height',H);
 				Animate(wrapper).animate({width:W},300,function(){css.set(box.firstChild,'display','block')});
 			}
