@@ -37,6 +37,22 @@
    container,
    timer=2000 ; 
 
+   var provinceList={
+   		'北京':['北京'],
+   		'上海':['上海'],
+   		'江西':["南昌市","景德镇市","萍乡市","九江市","新余市","鹰潭市","赣州市","吉安市","宜春市","抚州市","上饶市"],
+   		'重庆':['重庆'],
+   		'天津':['天津'],
+   		'河北':["石家庄市","唐山市","秦皇岛市","邯郸市","邢台市","保定市","张家口市","承德市","沧州市","廊坊市","衡水市"],
+   		"浙江":["杭州市","宁波市","温州市","嘉兴市","湖州市","绍兴市","金华市","衢州市","舟山市","台州市","丽水市"],
+   		"安徽":["合肥市","芜湖市","蚌埠市","淮南市","马鞍山市","淮北市","铜陵市","安庆市","黄山市","滁州市","阜阳市","宿州市","巢湖市","六安市","亳州市","池州市","宣城市"],
+   		"福建":["福州市","厦门市","莆田市","三明市","泉州市","漳州市","南平市","龙岩市","宁德市"],
+   		"山东":["济南市","青岛市","淄博市","枣庄市","东营市","烟台市","潍坊市","济宁市","泰安市","威海市","日照市","莱芜市","临沂市","德州市","聊城市","滨州市","荷泽市"],
+   		"河南":["郑州市","开封市","洛阳市","平顶山市","安阳市","鹤壁市","新乡市","焦作市","濮阳市","许昌市","漯河市","三门峡市","南阳市","商丘市","信阳市","周口市","驻马店市"],
+   		"湖北":["武汉市","黄石市","十堰市","宜昌市","襄樊市","鄂州市","荆门市","孝感市","荆州市","黄冈市","咸宁市","随州市","恩施土家族苗族自治州","仙桃市","潜江市","天门市","神农架林区"],
+   		"湖南":["长沙市","株洲市","湘潭市","衡阳市","邵阳市","岳阳市","常德市","张家界市","益阳市","郴州市","永州市","怀化市","娄底市","湘西土家族苗族自治州"],
+   		"广东":["广州市","深圳市","珠海市","汕头市","韶关市","佛山市","江门市","湛江市","茂名市","肇庆市","惠州市","梅州市","汕尾市","河源市","阳江市","清远市","东莞市","中山市","潮州市","揭阳市","云浮市"]
+   };
 
 	// dom ready
 	
@@ -704,7 +720,7 @@
 				nav.innerHTML='<a class="ins-tab" target="_blank" href="'+tipLink+'"><img src="'+tipImageSrc+'"></a><div class="ins-btn-close" title="关闭广告"><span>×</span>关闭</div>'
 				cont.innerHTML='<div class="ins-content-item ins-ad-item"><div class="ins-content-wrapper"><a class="ad-thumb" target="_blank" title="" href="'+contLink+'"><img src="'+contImageSrc+'"></a></div></div>';
 				if(_.style==2){
-					cont.innerHTML+='<div class="ins-form"><div class="ins-control-group"><label class="control-label">省份：</label><div class="ins-controls"><select class="ins-select"><option value="0">北京</option></select></div></div><div class="ins-control-group"><label class="control-label">城市：</label><div class="ins-controls"><select class="ins-select"><option value="0">北京</option></select></div></div><div class="ins-control-group"><label class="control-label">姓名：</label><div class="ins-controls"><input type="text"value="请输入您的姓名"class="ins-text ins-text-tip"/><dl class="ins-error-tip"><dt><em class="ins-arrow-outer"></em><em class="ins-arrow-inner"></em></dt><dd>请输入您的姓名</dd></dl></div></div><div class="ins-control-group"><label class="control-label">手机：</label><div class="ins-controls"><input type="text"maxlength="11"value="请输入您的手机号码"class="ins-text ins-text-tip"/><dl class="ins-error-tip"><dt><em class="ins-arrow-outer"></em><em class="ins-arrow-inner"></em></dt><dd>请输入11位手机号码</dd></dl></div></div><div class="ins-control-group"><label class="control-label"></label><div class="ins-controls"><a href="javascript:;"class="ins-btn-submit">预约试驾</a></div></div></div><p class="ins-brand-slogan"><a href="#" target="_blank">'+slogan+'</a></p>';					
+					cont.innerHTML+='<div class="ins-form"><div class="ins-control-group"><label class="control-label">省份：</label><div class="ins-controls"><select class="ins-select ins-province"></select></div></div><div class="ins-control-group"><label class="control-label">城市：</label><div class="ins-controls"><select class="ins-select ins-city"><option>北京</option></select></div></div><div class="ins-control-group"><label class="control-label">姓名：</label><div class="ins-controls"><input type="text" value="请输入您的姓名" class="ins-text ins-text-tip ins-name"/><dl class="ins-error-tip"><dt><em class="ins-arrow-outer"></em><em class="ins-arrow-inner"></em></dt><dd>请输入您的姓名</dd></dl></div></div><div class="ins-control-group"><label class="control-label">手机：</label><div class="ins-controls"><input type="text" maxlength="11" value="请输入您的手机号码" class="ins-text ins-phone ins-text-tip"/><dl class="ins-error-tip"><dt><em class="ins-arrow-outer"></em><em class="ins-arrow-inner"></em></dt><dd>请输入11位手机号码</dd></dl></div></div><div class="ins-control-group"><label class="control-label"></label><div class="ins-controls"><a href="javascript:;"class="ins-btn-submit">预约试驾</a></div></div></div><p class="ins-brand-slogan"><a href="#" target="_blank">'+slogan+'</a></p>';					
 				}
 				cont.innerHTML+='<div class="ins-content-footer"><div title="关闭" class="ins-btn-close">×</div></div>';
 				// 将dom插入页面
@@ -712,6 +728,16 @@
 				box.appendChild(wrap);
 				container.appendChild(box);
 
+				var fillProvince = function(){
+					var pro=U.$$(_.cont,'ins-province')[0],str='';
+					for(var p in provinceList){
+						str+='<option>'+p+'</option>'
+					}
+					pro.innerHTML=str;
+				};
+				if(_.style==2){
+					fillProvince();
+				}
 				_.box=box;
 				_.nav=nav;
 				_.cont=cont;
@@ -780,6 +806,43 @@
 					// _.box.style.display="none";
 					container.removeChild(_.box);
 				};
+				if(_.style==2){ 
+					// 省市联动
+					var pro=U.$$(_.cont,'ins-province')[0],
+						city=U.$$(_.cont,'ins-city')[0],
+						name=U.$$(_.cont,'ins-name')[0],
+						tip1=name.value,
+						phone=U.$$(_.cont,'ins-phone')[0],
+						tip2=phone.value;
+					pro.onchange = function(){
+						var p=this.value,str='',provinces=provinceList[p];
+						for(var i=0,len=provinces.length;i<len;i++){
+							str+='<option value="'+i+'">'+provinces[i]+'</option>'
+						}
+						city.innerHTML=str;
+					};
+
+					name.onfocus = phone.onfocus= function(){
+						var tip = this.className.indexOf('ins-name')!=-1?tip1:tip2,
+							val=  this.value.replace(/(^\s*)|(\s*$)/g,'');
+						if(tip==val){
+							this.value="";
+							this.className=this.className.replace(' ins-text-tip','');
+						}
+					};
+
+					name.onblur = phone.onblur= function(){
+
+						var tip = this.className.indexOf('ins-name')!=-1?tip1:tip2;
+						var val=  this.value.replace(/(^\s*)|(\s*$)/g,'');
+						if(val==''||val==tip){
+							this.value=tip;
+							this.className+=' ins-text-tip';
+						}
+						
+					};
+
+				}
 			},		
 			checkLocation : function(){		//检察位置是否正确
 
