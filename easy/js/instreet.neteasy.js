@@ -813,7 +813,8 @@
 						name=U.$$(_.cont,'ins-name')[0],
 						tip1=name.value,
 						phone=U.$$(_.cont,'ins-phone')[0],
-						tip2=phone.value;
+						tip2=phone.value,
+						submit=U.$$(_.cont,'ins-btn-submit')[0];
 					pro.onchange = function(){
 						var p=this.value,str='',provinces=provinceList[p];
 						for(var i=0,len=provinces.length;i<len;i++){
@@ -829,6 +830,7 @@
 							this.value="";
 							this.className=this.className.replace(' ins-text-tip','');
 						}
+						this.nextSibling.style.display='none';
 					};
 
 					name.onblur = phone.onblur= function(){
@@ -841,6 +843,20 @@
 						}
 						
 					};
+
+					submit.onclick = function(){
+
+						var val = name.value.replace(/(^\s*)|(\s*$)/g,'');
+						if(val==''||val==tip1){
+							name.nextSibling.style.display='block';
+							return;
+						}
+						val = phone.value.replace(/(^\s*)|(\s*$)/g,'');
+						if(val==''||val==tip2||/^1[3|4|5|8][0-9]\d{8}$/.test(val)==false){
+							phone.nextSibling.style.display='block';
+							return;
+						}
+					}
 
 				}
 			},		

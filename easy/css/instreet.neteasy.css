@@ -66,7 +66,7 @@
 }
 .instreet-plugin-box .ins-btn-close{
     background-color: #FDFDFB;
-    border: 1px solid #EEEEEE;
+    border: 1px solid #DDD;
     color: #666666;
     display: block;
     font-size: 12px;
@@ -165,17 +165,18 @@
 	background-color: #FFF;
 	position: absolute;
 	border: 1px solid #eee;
-	left: 136px;
+	left: 2px;
 	right: auto;
 	width: 120px;
 	padding: 2px;
-	top: 0;
+	top: -33px;
 	box-shadow: 0px 0px 7px #EEE;
 	margin: 0;
 	color: #444;
 	text-align: center;
-	opacity: 0.9;
+/*	opacity: 0.9;*/
 	border-radius: 5px;
+	z-index: 10;
 }
 .instreet-plugin-box .ins-style2 .ins-form .ins-error-tip dd{
 	border-radius: 4px;
@@ -184,21 +185,23 @@
 }
 .ins-error-tip .ins-arrow-outer,.ins-error-tip .ins-arrow-inner{
 	position: absolute;
-	top:9px;
-	left: -13px;
+	top: auto;
+	left: 45%;
+	bottom: -12px;
 	width: 0;
 	height: 0;
 	line-height: 0;
 	font-size: 0;
-	border-style:dashed solid dashed dashed;
+	border-style: solid dashed dashed;
 	border-width: 6px;
-	border-color: transparent #FFF transparent transparent;
+	border-color: #FFF transparent transparent;
 }
 .ins-error-tip .ins-arrow-inner{
 	border-width: 5px;
-	top:10px;
-	left: -8px;
-	border-color: transparent #FF9900 transparent transparent;
+	top: auto;
+	left: 46%;
+	bottom: -8px;
+	border-color: #FF9900 transparent transparent;
 }
 .instreet-plugin-box .ins-style2 .ins-form .ins-select{
 	border-radius: 4px;
