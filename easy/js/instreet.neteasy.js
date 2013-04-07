@@ -662,6 +662,11 @@
 					firstImage.setAttribute('instreet_image',true);
 					netEasyObj = new NetEasyTip(firstImage,config.style);
 				}
+			}else if(parseInt(config.style)==3){
+				if(w>=500&&w<=650&&h>=125){
+					firstImage.setAttribute('instreet_image',true);
+					netEasyObj = new NetEasyInteraction(firstImage,config.style);
+				}
 			}
 		};
 		//重加载图片，获取图片的尺寸
@@ -707,7 +712,7 @@
 			},
 			create :function(){
 				var _=this,tipImageSrc='images/tip1.jpg',tipLink='#',
-					contImageSrc=config.style==1?'images/car4.jpg':'images/car3.jpg',contLink='#',slogan='新轩逸-首付2.38万元起》';
+					contImageSrc=config.style==1?'images/car5.png':'images/car3.jpg',contLink='#',slogan='新轩逸-首付2.38万元起》';
 
 				var box = U.createElem('div'),
 					wrap = U.createElem('div'),
@@ -743,6 +748,7 @@
 				_.cont=cont;
 			},
 			locate :function(){
+
 				var _=this,timer=5000;
 				clearTimeout(_.timer);
 				_timer = setTimeout(function(){
@@ -807,59 +813,66 @@
 					container.removeChild(_.box);
 				};
 				if(_.style==2){ 
-					// 省市联动
-					var pro=U.$$(_.cont,'ins-province')[0],
-						city=U.$$(_.cont,'ins-city')[0],
-						name=U.$$(_.cont,'ins-name')[0],
-						tip1=name.value,
-						phone=U.$$(_.cont,'ins-phone')[0],
-						tip2=phone.value,
-						submit=U.$$(_.cont,'ins-btn-submit')[0];
-					pro.onchange = function(){
-						var p=this.value,str='',provinces=provinceList[p];
-						for(var i=0,len=provinces.length;i<len;i++){
-							str+='<option value="'+i+'">'+provinces[i]+'</option>'
-						}
-						city.innerHTML=str;
-					};
 
-					name.onfocus = phone.onfocus= function(){
-						var tip = this.className.indexOf('ins-name')!=-1?tip1:tip2,
-							val=  this.value.replace(/(^\s*)|(\s*$)/g,'');
-						if(tip==val){
-							this.value="";
-							this.className=this.className.replace(' ins-text-tip','');
-						}
-						this.nextSibling.style.display='none';
-					};
-
-					name.onblur = phone.onblur= function(){
-
-						var tip = this.className.indexOf('ins-name')!=-1?tip1:tip2;
-						var val=  this.value.replace(/(^\s*)|(\s*$)/g,'');
-						if(val==''||val==tip){
-							this.value=tip;
-							this.className+=' ins-text-tip';
-						}
-						
-					};
-
-					submit.onclick = function(){
-
-						var val = name.value.replace(/(^\s*)|(\s*$)/g,'');
-						if(val==''||val==tip1){
-							name.nextSibling.style.display='block';
-							return;
-						}
-						val = phone.value.replace(/(^\s*)|(\s*$)/g,'');
-						if(val==''||val==tip2||/^1[3|4|5|8][0-9]\d{8}$/.test(val)==false){
-							phone.nextSibling.style.display='block';
-							return;
-						}
-					}
+					_.formValidate();
 
 				}
-			},		
+			},	
+			formValidate : function(){
+
+				var _=this,
+					pro=U.$$(_.cont,'ins-province')[0],
+					city=U.$$(_.cont,'ins-city')[0],
+					name=U.$$(_.cont,'ins-name')[0],
+					tip1=name.value,
+					phone=U.$$(_.cont,'ins-phone')[0],
+					tip2=phone.value,
+					submit=U.$$(_.cont,'ins-btn-submit')[0];
+				pro.onchange = function(){
+					var p=this.value,str='',provinces=provinceList[p];
+					for(var i=0,len=provinces.length;i<len;i++){
+						str+='<option value="'+i+'">'+provinces[i]+'</option>'
+					}
+					city.innerHTML=str;
+				};
+
+				name.onfocus = phone.onfocus= function(){
+					var tip = this.className.indexOf('ins-name')!=-1?tip1:tip2,
+						val=  this.value.replace(/(^\s*)|(\s*$)/g,'');
+					if(tip==val){
+						this.value="";
+						this.className=this.className.replace(' ins-text-tip','');
+					}
+					this.nextSibling.style.display='none';
+				};
+
+				name.onblur = phone.onblur= function(){
+
+					var tip = this.className.indexOf('ins-name')!=-1?tip1:tip2;
+					var val=  this.value.replace(/(^\s*)|(\s*$)/g,'');
+					if(val==''||val==tip){
+						this.value=tip;
+						this.className+=' ins-text-tip';
+					}
+					
+				};
+
+				submit.onclick = function(){
+
+					var val = name.value.replace(/(^\s*)|(\s*$)/g,'');
+					if(val==''||val==tip1){
+						name.nextSibling.style.display='block';
+						return;
+					}
+					val = phone.value.replace(/(^\s*)|(\s*$)/g,'');
+					if(val==''||val==tip2||/^1[3|4|5|8][0-9]\d{8}$/.test(val)==false){
+						phone.nextSibling.style.display='block';
+						return;
+					}
+					return false;
+				}
+
+			},	
 			checkLocation : function(){		//检察位置是否正确
 
 				var _=this,img=_.image,pos=U.getXY(img),info=_.imageInfo;
@@ -891,6 +904,109 @@
 				var _=this;				
 				if(parseFloat(css.get(_.cont,'width'))>0){
 					Animate(_.cont).stop().animate({width:0});
+				}
+			}
+
+		});
+		// NetEasyInteraction继承自NetEasyTip
+		var NetEasyInteraction = function(img,style){
+			NetEasyTip.call(this,img,style);
+		};
+		var F = function(){};
+		F.prototype = NetEasyTip.prototype;
+		NetEasyInteraction.fn = NetEasyInteraction.prototype = new F();
+		extend(NetEasyInteraction.fn,{
+			create : function(){
+				var _=this,titleText='免费试驾,火热报名中',titleLink='#',
+					sloganImageSrc='images/hor.png',sloganLink='#';
+				var box = U.createElem('div'),
+					wrap = U.createElem('div'),
+					cont = U.createElem('div');
+				box.className="instreet-plugin-box";
+				wrap.className="ins-wrapper ins-style"+config.style;
+				cont.className="ins-main-content";	
+				var htmlStr='<div class="ins-content-item ins-ad-item"><div class="ins-content-wrapper"><h5 class="ins-title"><a href="'+titleLink+'" target="_blank">'+titleText+'</a><strong class="ins-btn-close" title="关闭">×</strong></h5><div class="ins-form">';
+				htmlStr+='<div class="ins-control-group"><label class="control-label">省份：</label><div class="ins-controls"><select class="ins-select ins-province"></select></div></div><div class="ins-control-group"><label class="control-label">城市：</label><div class="ins-controls"><select class="ins-select ins-city"><option>北京</option></select></div></div><div class="ins-control-group"><label class="control-label">姓名：</label><div class="ins-controls"><input type="text" value="请输入您的姓名" class="ins-text ins-text-tip ins-name"/><dl class="ins-error-tip"><dt><em class="ins-arrow-outer"></em><em class="ins-arrow-inner"></em></dt><dd>请输入您的姓名</dd></dl></div></div><div class="ins-control-group"><label class="control-label">手机：</label><div class="ins-controls"><input type="text" maxlength="11" value="请输入您的手机号码" class="ins-text ins-phone ins-text-tip"/><dl class="ins-error-tip"><dt><em class="ins-arrow-outer"></em><em class="ins-arrow-inner"></em></dt><dd>请输入11位手机号码</dd></dl></div></div><div class="ins-control-group"><label class="control-label"></label><div class="ins-controls"><button class="ins-btn-submit">预约试驾</button></div></div>';				
+				htmlStr+='</div><p class="ins-brand-slogan"><a href="'+sloganLink+'" target="_blank"><img src="'+sloganImageSrc+'"/></a></p></div></div>';
+				cont.innerHTML=htmlStr;
+				wrap.style.height="25px";
+				cont.style.height="123px";
+				// 将dom插入页面
+				wrap.appendChild(cont);
+				box.appendChild(wrap);
+				container.appendChild(box);
+
+				var fillProvince = function(){
+					var pro=U.$$(_.cont,'ins-province')[0],str='';
+					for(var p in provinceList){
+						str+='<option>'+p+'</option>'
+					}
+					pro.innerHTML=str;
+				};
+
+				fillProvince();
+				
+				_.box=box;
+				_.cont=cont;
+			},
+			locate : function(){
+
+				var _=this,timer=5000;
+				clearTimeout(_.timer);
+				_timer = setTimeout(function(){
+
+					var image=_.image;
+					var pos=U.getXY(image),screenH=Math.max(document.body.clientHeight,document.documentElement.clientHeight);
+						
+					_.imageInfo={width:image.clientWidth,height:image.clientHeight,x:pos.x,y:pos.y,src:image.src};
+					if(U.isVisible(image)){
+						var top=(pos.y+image.offsetHeight)+'px',left=pos.x+'px';
+						_.cont.parentNode.style.width=image.offsetWidth+'px';						
+						_.box.style.cssText="visibility:visible;top:"+top+";left:"+left+";";
+						
+					}
+					if(config.autoShow&&_.firstShow!=false){
+
+						_.slideUp();_.firstShow=false;
+						setTimeout(function(){_.slideDown();},timer);
+					}
+
+				},100);	
+			},
+			bindEvents : function(){
+				var _=this,image=_.image,cont=_.cont,close=U.$$(cont,'ins-btn-close')[0];
+				var over = function(){
+					clearTimeout(_.timerSlider);				
+					_.slideUp();
+					
+				},
+				out = function(){
+					clearTimeout(_.timerSlider);
+					_.timerSlider = setTimeout(function(){_.slideDown();},timer);
+				};
+				U.bind(image,'mouseover',over);
+				U.bind(image,'mouseout',out);
+				U.bind(_.box,'mouseover',over);
+				U.bind(_.box,'mouseout',out);
+				close.onclick = function(){
+					_.slideDown();
+				};
+				_.formValidate();
+			},
+			slideUp : function(){
+				var _=this,cont=_.cont,wrap=cont.parentNode,h=parseFloat(css.get(wrap,'height')),
+					height=parseFloat(css.get(cont,'height'));
+				
+				if(h==25){
+					Animate(wrap).stop().animate({height:height});
+				}
+			},
+			slideDown : function(){
+				var _=this,cont=_.cont,wrap=cont.parentNode,h=parseFloat(css.get(wrap,'height')),
+					height=parseFloat(css.get(cont,'height'));
+				
+				if(h>25){
+					Animate(wrap).stop().animate({height:25});
 				}
 			}
 
