@@ -23,7 +23,7 @@
 #instreet-plugin-container .clearfix {
     *zoom: 1;
 }
-#instreet-plugin-container ul,#instreet-plugin-container li,#instreet-plugin-container p,#instreet-plugin-container dd{
+#instreet-plugin-container h5,#instreet-plugin-container ul,#instreet-plugin-container li,#instreet-plugin-container p,#instreet-plugin-container dd{
 	padding:0;
 	margin: 0;
 }
@@ -32,9 +32,10 @@
 #instreet-plugin-container .instreet-plugin-box{	
 	visibility: hidden;
 	position: absolute;
-	top: 28px;
+	top: auto;
+	bottom: auto;
 	left: auto;
-	right: 406px;
+	right: auto;
 	overflow:visible;
 	z-index: 9990; /*zIndex最大值*/
 	-o-transition:all 0.1s ease;
@@ -118,6 +119,18 @@
 	float: right;
 	width: 0 ;
 }
+.instreet-plugin-box .ins-style3{
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	top: auto;
+	overflow: hidden;
+	height: 25px;
+}
+.instreet-plugin-box .ins-style3 .ins-main-content {		
+	float: none;
+	width: auto;
+}
 .instreet-plugin-box .ins-style0 .ins-main-content .ins-content-wrapper{		
 	width: 300px;
 }
@@ -126,6 +139,9 @@
 }
 .instreet-plugin-box .ins-style2 .ins-main-content .ins-content-wrapper{		
 	width: 200px;
+}
+.instreet-plugin-box .ins-style3 .ins-main-content .ins-content-wrapper{		
+	background-color: #000;
 }
 /*ins-ad-item*/
 .instreet-plugin-box .ins-main-content .ins-ad-item {
@@ -136,19 +152,53 @@
 	display: block;
 }
 .instreet-plugin-box .ins-style0 .ins-ad-item .ad-thumb{
-		height:195px;
+	height:195px;
 }
 .instreet-plugin-box .ins-style1 .ins-ad-item .ad-thumb{
-		height:250px;
+	height:250px;
+}
+.instreet-plugin-box .ins-style3 .ins-title{
+    border-bottom: 1px solid #444444;
+    font-size: 14px;
+    padding: 2px 10px !important;
+    height: 20px;
+}
+.instreet-plugin-box .ins-style3 .ins-title a{
+    display: inline-block;
+    height: 100%;
+    overflow: hidden;
+    width: 320px;
+    color: red;
+}
+.instreet-plugin-box .ins-style3 .ins-title .ins-btn-close{
+    font-size: 16px;
+    padding: 2px 4px;
+    position: absolute;
+    right: 3px;
+    top: 3px;
 }
 /*ins-form*/
-.instreet-plugin-box .ins-style2 .ins-form{
+.instreet-plugin-box .ins-style2 .ins-form,.instreet-plugin-box .ins-style3 .ins-form{
 	padding:10px;
 	background: #000;
 	color:#FFF;
 }
+.instreet-plugin-box .ins-style3 .ins-form{
+	width: 480px;
+	padding: 5px 10px 0;
+	margin: 0 auto;
+}
 .instreet-plugin-box .ins-style2 .ins-form .ins-control-group{
 	margin-bottom: 8px;
+}
+.instreet-plugin-box .ins-style3 .ins-form .ins-control-group{
+	margin-bottom: 5px;
+}
+.instreet-plugin-box .ins-style3 .ins-form .ins-control-group{
+	display: inline-block;
+	*display: inline;
+	*zoom:1;
+	margin-right: 15px;
 }
 .instreet-plugin-box .ins-style2 .ins-form .control-label{
 	float: left;
@@ -160,7 +210,13 @@
 	position: relative;
 	margin-left: 45px;
 }
-.instreet-plugin-box .ins-style2 .ins-form .ins-error-tip{
+.instreet-plugin-box .ins-style3 .ins-form .ins-controls{
+	display: inline-block;
+	*display: inline;
+	*zoom:1;
+	position: relative;
+}
+.instreet-plugin-box .ins-style2 .ins-form .ins-error-tip,.instreet-plugin-box .ins-style3 .ins-form .ins-error-tip{
 	display: none;
 	background-color: #FFF;
 	position: absolute;
@@ -178,7 +234,7 @@
 	border-radius: 5px;
 	z-index: 10;
 }
-.instreet-plugin-box .ins-style2 .ins-form .ins-error-tip dd{
+.instreet-plugin-box .ins-style2 .ins-form .ins-error-tip dd,.instreet-plugin-box .ins-style3 .ins-form .ins-error-tip dd{
 	border-radius: 4px;
 	background-color: #FF9900;
 	padding: 2px 0 !important;
@@ -203,7 +259,7 @@
 	bottom: -8px;
 	border-color: #FF9900 transparent transparent;
 }
-.instreet-plugin-box .ins-style2 .ins-form .ins-select{
+.instreet-plugin-box .ins-style2 .ins-form .ins-select,.instreet-plugin-box .ins-style3 .ins-form .ins-select{
 	border-radius: 4px;
 	padding: 2px 5px;
 	width: 130px;
@@ -211,7 +267,7 @@
 	height: 24px;
 	border: medium none;
 }
-.instreet-plugin-box .ins-style2 .ins-form .ins-text{
+.instreet-plugin-box .ins-style2 .ins-form .ins-text,.instreet-plugin-box .ins-style3 .ins-form .ins-text{
 	border-radius: 4px;
 	width: 120px;
 	border: none;
@@ -219,23 +275,28 @@
 	height: 20px;
     line-height: 20px;
 }
-.instreet-plugin-box .ins-style2 .ins-form .ins-text-tip{
+.instreet-plugin-box .ins-style2 .ins-form .ins-text-tip,.instreet-plugin-box .ins-style3 .ins-form .ins-text-tip{
 	color:#666;
 }
-.instreet-plugin-box .ins-style2 .ins-brand-slogan{
+.instreet-plugin-box .ins-style2 .ins-brand-slogan,.instreet-plugin-box .ins-style3 .ins-brand-slogan{
 	text-align: center;
-	border-top: 1px solid #333;
+	border-top: 1px solid #444;
 	background: #000;
 	padding: 2px 0!important;
 	height: 20px;
 	overflow: hidden;
 }
-.instreet-plugin-box .ins-style2 .ins-brand-slogan a{
+.instreet-plugin-box .ins-style3 .ins-brand-slogan{
+	height: 30px;
+	padding:0!important;
+}
+
+.instreet-plugin-box .ins-style2 .ins-brand-slogan a,.instreet-plugin-box .ins-style3 .ins-brand-slogan a{
 	color: #FFF;
 }
 .instreet-plugin-box .ins-btn-submit{
 	display: inline-block;
-	width: 60px;
+	width: 90px;
 	padding: 4px 12px;
 	margin-bottom: 0;
 	font-size: 14px;
@@ -245,6 +306,7 @@
 	vertical-align: middle;
 	cursor: pointer;
 	border-radius: 3px;
+	border: none;
 
 	color: #ffffff;
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
