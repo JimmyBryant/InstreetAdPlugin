@@ -71,10 +71,15 @@ a img{
 	border: 1px solid #ccc;
 	color: #444;
 }
+.size-200{
+	width: 190px;
+}
 .size-250{
 	width: 240px;
 }
-
+.size-300{
+	width: 290px;
+}
 .widget-wrap a,.widget-wrap a:link{
 	color:#5093d5; 
 }
@@ -144,7 +149,7 @@ a img{
 #widget-main-content::-webkit-scrollbar-thumb{background-color:#c2c2c2;background-clip:padding-box;border:1px solid #979797;min-height:28px}
 #widget-main-content::-webkit-scrollbar-thumb:hover{border:1px solid #636363;background-color:#929292}
 
-.size-250 #widget-main-content{
+.size-200 #widget-main-content,.size-250 #widget-main-content,.size-300 #widget-main-content{
 	height: 200px;
 	overflow-y: auto;
 }
