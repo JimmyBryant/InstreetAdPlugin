@@ -32,7 +32,7 @@
 		*	配置不同网站图集页上一张、下一张按钮
 		**/
 		var galleryConfig = [{
-			host:'*.msn.com.cn',
+			widgetSid:'746YRj7kfucKZSZc3KfGo0',
 			containerId:'picbox',
 			leftClass:'p_left',
 			leftTitle:'上一张',
@@ -918,9 +918,8 @@
 					left=a;right=b;	
 				};
 				for(;i<galleryConfig.length;i++){
-					var s=galleryConfig[i],
-						reg=new RegExp(s.host.replace('*','[a-z]+')+'$','i');
-					if(reg.test(host)){
+					var s=galleryConfig[i];
+					if(s.widgetSid==config.widgetSid){
 						getGalleryBtn(s);
 						continue;
 					}

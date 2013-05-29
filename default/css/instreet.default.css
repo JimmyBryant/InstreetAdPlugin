@@ -1,12 +1,23 @@
 #instreet-plugin-container{
-   font: 12px/1.5 serif,arial,yahei; 
+   font: 12px/1.5 microsoft yahei,airal,serif; 
    text-align:left;
 }
 #instreet-plugin-container div,#instreet-plugin-container dd,#instreet-plugin-container p,#instreet-plugin-container dl,#instreet-plugin-container dt,#instreet-plugin-container li{
    margin:0;
 }
-#instreet-plugin-container .clear{
+#instreet-plugin-container .clearfix{
    clear:both;
+}
+ #instreet-plugin-container .clearfix:before,
+ #instreet-plugin-container .clearfix:after {
+    content: " "; 
+    display: table; 
+}
+#instreet-plugin-container .clearfix:after {
+    clear: both;
+}
+#instreet-plugin-container .clearfix {
+    *zoom: 1;
 }
 #instreet-plugin-container a img{
    border:none;
@@ -81,41 +92,61 @@
 
 /*******spot******/
 .instreet-spot-shop, .instreet-spot-weibo, .instreet-spot-wiki{
-    border: 1px solid #FFFFFF;
-    cursor: pointer;
-    display: block;
-    height: 23px;
-	 width:23px;
-    position: absolute;
-    z-index: 999;
-	 background:url("../images/wdbg.png") no-repeat;
-	 outline:none;
-	 display:none;
+  background:url(../images/stip-sprite.png) no-repeat ;
+  position: absolute;
+  cursor: pointer;
+  height: 26px;
+	width:26px;  
+  z-index: 999;
+	outline:none;
+	display:none;
+  text-align: center;
+  vertical-align: middle;
+  z-index:1;
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+  filter: alpha(opacity=50);
+  opacity: 0.5;
+ 
+}
+.spot-holder #ins-spot-focus{
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: alpha(opacity=100);
+  opacity: 1;
+  z-index: 1999999;
 }
 .instreet-spot-shop{
-	background-position:-11px -161px;
-}
-.instreet-spot-shop:hover{
-    background-position:-44px -161px;
+	background-position:-282px -3px;
 }
 .instreet-spot-weibo{
-	background-position:-11px -197px;
-}
-.instreet-spot-weibo:hover{
-    background-position:-44px -197px;
+	background-position:-220px -3px;
 }
 .instreet-spot-wiki{
-	background-position:-11px -125px;
+	background-position:-127px -3px;
 }
+.instreet-spot-shop:hover,
+.instreet-spot-weibo:hover,
 .instreet-spot-wiki:hover{
-    background-position:-44px -125px;
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: alpha(opacity=100);
+  opacity: 1;
 }
+
 
 /*********holder*********/
-#instreet-plugin-container .shop-holder,#instreet-plugin-container .weibo-holder,#instreet-plugin-container .wiki-holder{
-    position:absolute;z-index: 999999;
-	width:300px;
-
+#instreet-plugin-container .shop-holder,
+#instreet-plugin-container .weibo-holder,
+#instreet-plugin-container .wiki-holder{
+  position:absolute;z-index: 999999;
+  width: 270px !important;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0px 1px 8px rgba(0,0,0,0.2);
+  -webkit-box-shadow: 0px 1px 8px rgba(0,0,0,0.2);
+  -moz-box-shadow: 0px 1px 8px rgba(0,0,0,0.2);
+  border: 1px solid #DDD;
+  border-radius: 4px;
+}
+#instreet-plugin-container .shop-imageonly{
+  width: 126px;
 }
 #instreet-plugin-container .shop-holder .instreet-slider-left,#instreet-plugin-container .shop-holder .instreet-slider-right{
 	background: url("../images/wdbg.png") repeat scroll -47px -394px transparent;
@@ -140,47 +171,70 @@
    background-position:-82px -394px;
 }
 #instreet-plugin-container .cont-head{
-   background:url("../images/wdbg.png") no-repeat -152px -361px;
-   height:21px;
+   /*background:url("../images/wdbg.png") no-repeat -152px -361px;*/
+   position: relative;
+   height:auto;
    width:100%;
    overflow:hidden;
    margin: 0;
+   font-size: 13px;
+}
+#instreet-plugin-container .cont-head .h1-title{
+  display: inline-block;
+  *display: inline;
+  *zoom:1;
+  max-width: 75%;
+  _width:75%;
+  padding: 5px 10px 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 250px;
+  overflow: hidden;
 }
 #instreet-plugin-container .cont-head .button-close-holder{
-    background:#000000;
-    _background:#3a3a3a;
-    color: #FFFFFF;
-    float: right;
-    font: bold 16px/0.9 arial,serif;
-    height: 15px;
-    outline: medium none;
-    position: relative;
-    right: 6px;
-    text-align: center;
-    text-decoration: none;
-    top: 3px;
-    width: 15px;
+  color: #999;
+  font: bold 18px/1 arial,serif;
+  height: 15px;
+  outline: medium none;
+  right: 6px;
+  text-align: center;
+  text-decoration: none;
+  top: 3px;
+  width: 15px;
+  position: absolute;
 /*	background:url("../images/wdbg.png") no-repeat -135px -361px transparent;
 	-background:#000;
 	-filter:alpha(opacity=0);*/
 }
 #instreet-plugin-container .cont-head .button-close-holder:hover{
     /*background-position:-431px -394px;*/
-    color: #F97127;
+    color: #666;
+}
+#instreet-plugin-container .cont-head .head-right{
+  display: inline-block;
+  *display: inline;
+  *zoom:1;
+  margin: 10px 5px;
+  vertical-align: top;
 }
 #instreet-plugin-container .cont-body {
-	background: url("../images/wdbg.png") no-repeat scroll -107px -43px transparent;
-    left: 0;
+	/*background: url("../images/wdbg.png") no-repeat scroll -107px -43px transparent;
+  left: 0;
     position: absolute;
     top: 21px;
-    width: 100%;
-	z-index:10;
+    z-index:10;*/
+  width: auto;
 	display:none;
 }
-#instreet-plugin-container .weibo-holder .cont-body,#instreet-plugin-container .wiki-holder .cont-body{
+#instreet-plugin-container .shop-holder .cont-body,
+#instreet-plugin-container .weibo-holder .cont-body,
+#instreet-plugin-container .wiki-holder .cont-body{
     display:block;
+    padding: 5px 10px;
 }
-
+#instreet-plugin-container .weibo-holder .cont-body{
+  border-top:1px solid #DDD;
+}
 #instreet-plugin-container .cont-body .summary {background: transparent;}
 #instreet-plugin-container #instreet-shop-focus{
     display:block;
@@ -188,115 +242,161 @@
 }
 #instreet-plugin-container .cont-body .left{
   float:left;
-  width:145px;
+  width:121px;
 }
 #instreet-plugin-container .cont-body .right{
   float:left;
-  width: 155px;
-  padding: 10px 0 0;
+  width: 125px;
+  padding: 0;
+  margin:0;
 }
 #instreet-plugin-container .weibo-holder .cont-body .left{
-  width:70px;
+  width:65px;
 }
 #instreet-plugin-container .weibo-holder .cont-body .right{
-  width:230px;
+  width:215px;
 }
 #instreet-plugin-container .wiki-holder .cont-body .left{
   width:80px;
 }
 #instreet-plugin-container .wiki-holder .cont-body .right{
-  width:220px;
+  width:170px;
 }
-#instreet-plugin-container .cont-body  .thumb{
-	
+#instreet-plugin-container .thumb{
     display: inline-block;
-    margin: 10px 0 0 22px;
+    vertical-align: top;
+    margin: 0;
 }
-#instreet-plugin-container .cont-body .thumb img{
+#instreet-plugin-container .thumb img{
    background: url("../images/loading-default.gif") no-repeat scroll center center #FFFFFF;
-   width:100px;
-   height:100px;
    vertical-align:top;
 }
-#instreet-plugin-container .weibo-holder .cont-body .thumb{
-   width:50px;
-   height:50px;
-   margin:10px;
+#instreet-plugin-container .shop-holder .product-large-image{
+  text-align: center;
 }
-#instreet-plugin-container .wiki-holder .cont-body .thumb{
-  width:60px;
-  height:60px;
-  vertical-align:middle;
-  margin:10px 0 0 10px;
+#instreet-plugin-container .shop-holder .cont-body .thumb{
+  display: block;
+  padding:0;
+}
+#instreet-plugin-container .shop-holder .thumb img{
+  width:100px;
+  height:100px;
+  border:1px solid #DDD;
+}
+#instreet-plugin-container .shop-holder .product-large-image .thumb img{
+  width: auto;
+  height: auto;
+  max-width: 248px;
+  max-height: 248px;
+   _width:expression(this.width>=this.height&&this.width>248?"248px":this.width);
+   _height:expression(this.height>=this.width&&this.height>248?"248px":this.height);
+}
 
-}
-#instreet-plugin-container .weibo-holder .cont-body .thumb img{
-   width:50px;
-   height:50px;
+#instreet-plugin-container .wiki-holder .cont-body .thumb{
+  width:65px;
+  height:65px;
+  vertical-align:middle;
 }
 #instreet-plugin-container .wiki-holder .cont-body .thumb img{
    width:auto;
    height:auto;
    max-width: 65px;
    max-height: 65px;
-   _width:65px;
+   _width:expression(this.width>=this.height&&this.width>65?"65px":this.width);
+   _height:expression(this.height>=this.width&&this.height>65?"65px":this.height);
    vertical-align:middle;
 }
-#instreet-plugin-container .cont-body *{
-  margin:0;color:#FFF;
+#instreet-plugin-container .weibo-holder .thumb{
+   width:50px;
+   height:50px;
+   margin:10px;
+}
+#instreet-plugin-container .weibo-holder .thumb img{
+   width:50px;
+   height:50px;
+}
+
+#instreet-plugin-container .cont-body{
+  margin:0;color:#666;
 }
 #instreet-plugin-container .cont-body .p-desc{
   margin:0;
   height:44px;
-  font-size: 14px;
+  font-size: 12px;
   overflow:hidden;
   padding-right:5px;
 }
-#instreet-plugin-container .cont-body .p-desc a{
-  color:#FFD34E;
+#instreet-plugin-container .cont-head a.p-name,
+#instreet-plugin-container .weibo-holder .nickname,
+#instreet-plugin-container .wiki-holder .nickname{
+  display: inline-block;
+  color: #333;
+  text-decoration: none;
+  border-bottom: 1px dotted #CCC;
+}
+
+#instreet-plugin-container .cont-head a.p-name:hover,
+#instreet-plugin-container .weibo-holder .nickname:hover,
+#instreet-plugin-container .wiki-holder .nickname:hover{
   text-decoration:none;
+  color:#c10001;
+  border-bottom: 1px dotted #c10001;
 }
-#instreet-plugin-container .cont-body .p-desc a:hover{
-  text-decoration:underline;
-  /*color:#F71B1B;*/
+#instreet-plugin-container .cont-body .p-money{
+  color:#cbcbcb;
 }
-#instreet-plugin-container .cont-body .p-money,#instreet-plugin-container .cont-body .p-nowmoney{
-  color:#FFD34E;
+#instreet-plugin-container .cont-body .p-nowmoney{
+  color:#c00;
 }
-#instreet-plugin-container .cont-body .p-money strong{
-  font-weight:bold;
+#instreet-plugin-container .cont-body .p-nowmoney em,#instreet-plugin-container .cont-body .p-money em{
+  font-family: arial, verdana, sans-serif;
+  font-style: normal;
+  color:#c00;
+  font-size:14px;
+}
+#instreet-plugin-container .cont-body .p-money em{
   text-decoration:line-through;
-  color:#FFF;
-  font-size:16px;
-}
-#instreet-plugin-container .cont-body .p-nowmoney strong{
-  font-weight:bold;
-  color:#FFF;
-  font-size:16px;
+  color:#cbcbcb;
 }
 #instreet-plugin-container .cont-body .p-buyit .button-buy{
-	display: inline-block;
-	height: 25px;
-	margin: 5px 0 10px;
-	width: 53px;
-	background:url("../images/wdbg.png") no-repeat -10px -232px;
+	position: absolute;
+  bottom: 6px;
+  left: auto;
+  color: #333;
+  font-weight: bold;
+  border-radius: 2px;
+  text-decoration: none;
+	height: 20px;
+  line-height: 22px;
+	padding: 4px 15px;
+  background: rgb(238,238,238); /* Old browsers */
+  background: -moz-linear-gradient(top,  rgba(238,238,238,1) 0%, rgba(204,204,204,1) 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(238,238,238,1)), color-stop(100%,rgba(204,204,204,1))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  rgba(238,238,238,1) 0%,rgba(204,204,204,1) 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top,  rgba(238,238,238,1) 0%,rgba(204,204,204,1) 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top,  rgba(238,238,238,1) 0%,rgba(204,204,204,1) 100%); /* IE10+ */
+  background: linear-gradient(to bottom,  rgba(238,238,238,1) 0%,rgba(204,204,204,1) 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#cccccc',GradientType=0 ); /* IE6-9 */
+
+
+	/*background:url("../images/wdbg.png") no-repeat -10px -232px;*/
 }
 #instreet-plugin-container .cont-body .p-buyit .button-buy:hover{
-  background-position:-73px -232px;
+  
 }
-#instreet-plugin-container .weibo-holder .nickname,#instreet-plugin-container .wiki-holder .nickname{
-   color:#FFD34E;
-   text-decoration:none;
-}
+
 #instreet-plugin-container .weibo-holder .nickname:hover,#instreet-plugin-container .wiki-holder .nickname:hover{
-   text-decoration:underline;
+   
 }
-#instreet-plugin-container .weibo-holder .icon,#instreet-plugin-container .wiki-holder .icon{
-    padding:5px 10px;
+#instreet-plugin-container .weibo-holder .icon{
+  margin-top: 10px;
+}
+#instreet-plugin-container .wiki-holder .icon{
+    padding:5px 0;
     text-align: right;
 }
 #instreet-plugin-container .wiki-holder .summary{
-    padding-right:10px;
+    padding-right:0;
 }
 /********foot ad**********/
  #instreet-plugin-container .ad-holder{
