@@ -1,8 +1,8 @@
 //config.js the configuration for the widget 
 var prefix="http://push.instreet.cn/";
 var config={
-		// cssurl 	:	"http://static.instreet.cn/widgets/push/css/instreet.default.min.css",
-		cssurl	: 	"css/instreet.default.css", 
+		// cssurl 	:	"http://static.instreet.cn/widgets/push/css/instreet.pinad.min.css",
+		cssurl	: 	"css/instreet.pinad.css", 
 		redurl	:	prefix+"click.action",
 	callbackurl	:	prefix+"push.action",
 		murl	:	prefix+"tracker.action",

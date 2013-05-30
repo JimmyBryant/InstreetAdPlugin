@@ -1,6 +1,482 @@
-/***************************************
-*InstreetAd Class
-***************************************/
+/*
+*	default.js  @VERSION
+*/ 
+(function(window,undefined){
+	if(window.InstreetImageWidget){
+		return;
+	}
+	var widget=window.InstreetImageWidget={
+		name :'pinad',
+		theme:'default',
+		version:'0.0.1'
+	};
+
+//config.js the configuration for the widget 
+var prefix="http://push.instreet.cn/";
+var config={
+		// cssurl 	:	"http://static.instreet.cn/widgets/push/css/instreet.pinad.min.css",
+		cssurl	: 	"css/instreet.pinad.css", 
+		redurl	:	prefix+"click.action",
+	callbackurl	:	prefix+"push.action",
+		murl	:	prefix+"tracker.action",
+		iurl    :	prefix+"tracker90.action",
+		ourl	:	prefix+"loadImage.action",
+		surl    :   prefix+"share/weiboshare",						
+		imih	:	290,
+		imiw	:	290,
+		timer   :   1000
+};
+
+//extend config info
+var extendConfig=function(c){
+   if(c&&typeof c=="object"){
+   
+     for(var i in c){
+	    config[i]=c[i];
+	 }
+   
+   }else{
+     return;		   
+   }
+
+};
+var document = window.document,
+	navigator = window.navigator,
+	location = window.location,
+	imgs=[];
+//cache对象，加载广告数据
+var cache={
+	adsArray   :[],
+    initData   :function(){
+	   var images=document.getElementsByTagName('img');
+	   for(var i=0,len=images.length;i<len;i++){
+	   	  var img=images[i];
+	   	  imgs[i]=img;
+	   	  img.insId=i;
+	   	  img.setAttribute("instreet-img-id",i);
+	   	  cache.onImgLoad(img);
+	   }
+
+    },
+    onImgLoad  :function(img){
+		 var image=new Image();
+		 image.src=img.src,
+		 image.insId=img.insId;
+		 if(image.complete){
+		    cache.loadData(image);
+		 }else{
+			 image.onload=function(){					   
+			   var obj=this;
+			   obj.onload=null;
+			   cache.loadData(image);  
+			 }				 
+	     }
+    },
+	loadData     :function(img){
+	   
+	   var index=img.insId,clientImg=imgs[index];		   
+	   if(img.width>=config.imiw&&img.height>=config.imih){
+		  if(clientImg.clientWidth>=config.imiw&&clientImg.clientHeight>=config.imih){
+	   	 	  instreet.recordImage(clientImg);	
+		   	  if(typeof config.adsLimit=="number"&&config.adsLimit<=0){	
+		   	  	return;
+		   	  }	
+			   		   
+			   cache.createJsonp(clientImg);
+			   config.adsLimit&&config.adsLimit--;				   	  			   	  					   
+		    }
+		}			   
+	},
+	createJsonp  :function(img){
+	   var w=img.clientWidth,h=0;
+	   var iu=encodeURIComponent(encodeURIComponent(img.src)),url=config.callbackurl+"?index="+img.insId+"&pd="+config.widgetSid+"&iu="+iu+"&callback=insjsonp&w="+w+"&h="+h;
+	   ev.importFile('js',url);
+	}
+
+};
+//function util
+var	ev = {                  
+	bind : function(element,type,handler){
+		if(element.addEventListener){
+			element.addEventListener(type,handler,false);
+		}else if(element.attachEvent){
+			element.attachEvent("on"+type,handler);
+		}else{
+			element["on"+type] = handler;
+		}
+	},
+	remove : function(element,type,handler){
+		if(element.removeEventListener){
+			element.removeEventListener(type,handler,false);
+		}else if(element.datachEvent){
+			element.datachEvent("on"+type,handler);
+		}else{
+			element["on"+type] = null;
+		}
+	},
+	getEvent : function(event){
+		return event ? event : window.event;
+	},
+	getTarget : function(event){
+		return event.target || event.srcElement;
+	},
+	stopPropagation : function(event){
+		if(event.stopPropagation){
+			event.stopPropagation();
+		}else{
+			event.cancelBubble = true;
+		}
+	},
+	getRelatedTarget : function(event){
+		if(event.relatedTarget){
+			return event.relatedTarget;
+		}else if(event.type == "mouseover"){
+			return event.fromElement;
+		}else if(event.type == "mouseout"){
+			return event.toElement;
+		}else{
+			return null;
+		}
+	},
+	getXY : function (obj){
+			var x = 0, y = 0;
+			if (obj.getBoundingClientRect) {
+				var box = obj.getBoundingClientRect();
+				var D = document.documentElement;
+				x = box.left + Math.max(D.scrollLeft, document.body.scrollLeft) - D.clientLeft;
+				y = box.top + Math.max(D.scrollTop, document.body.scrollTop) - D.clientTop;
+			} else {
+				for (; obj != document.body; x += obj.offsetLeft, y += obj.offsetTop, obj = obj.offsetParent) {  }
+			};
+			return {  x: x,  y: y };
+	},
+	aTrim          :function(arr){	       
+		   var array=new Array();
+		   arr.sort(sortNum);
+		   var len=arr.length,flag=0;
+		   for(var i=0;i<len;i++){
+			   if(arr[i]!=arr[i+1]){
+				 array[flag]=arr[i];
+				 flag++;
+			  }
+		   }
+		   return array;
+		   function sortNum(a,b){return a-b;}
+	},
+    $:  function(parentNode,tagName,className){  
+    		   
+		var parent=parentNode||document,tag;
+		if(arguments.length==2){  
+			  className=tagName;
+			  tag="*";
+		}else{
+		  var tag=tagName||'*';
+		}
+		if(document.getElementsByClassName) return parent.getElementsByClassName(className);
+		var arr=[];
+		var elements=parent.getElementsByTagName(tag);
+		for(var l=elements.length,i=l;i--;){
+		   var ele=elements[i];
+		   if(ele.className){
+			 var cn=ele.className.replace(/\s/g,'|').split('|');
+			 for(var len=cn.length,j=len;j--;){
+				if(cn[j]==className){arr.push(ele);break;}
+			 }
+		   }
+		}
+		return arr;
+	},
+    importFile  :function(type,name){
+		 var link,script,
+		 head=document.getElementsByTagName( "head" )[0] || document.documentElement;
+		 switch(type){
+		   case "js": 
+		   script=document.createElement('script');
+		   script.async="async";script.charset="utf-8";
+		   script.type="text/javascript";
+		   script.onload = script.onreadystatechange = function () {
+		   		if(!script.readyState || script.readyState === "loaded" || script.readyState === "complete"){
+		   			script.onload = script.onreadystatechange = null;  
+					if ( head && script.parentNode ) {
+							head.removeChild( script );
+					}
+		   		}
+		   };
+		   script.src=name;
+		   head.appendChild(script);
+		   break;
+		   case "css":
+		   link = document.createElement("link");link.type = "text/css";link.rel = "stylesheet";
+		   link.href=name;
+		   head.appendChild(link);
+		   break;					   
+		 }
+	},
+	hasClass:function(obj,c){
+		if(obj.className){
+			var arr=obj.className.split(' ');
+			for(var i=0,len=arr.length;i<len;i++){
+				if(c===arr[i]){
+					return true;
+				}
+			}
+		}
+	   return false;
+	}
+};
+
+var $=function(id){return document.getElementById(id);}	//simplify document.getElementById
+	,
+    each=function(arrs,handler){
+    	if(arrs.length){
+    		for(var i=0,len=arrs.length;i<len;i++){
+    			handler.call(arrs[i],i);
+    		}
+    	}else{
+    		arrs&&handler.call(arrs,0);
+    	}
+    }
+    ,
+    hide=function(elem){
+    	each(elem,function(){
+    		this.style.display="none";
+    	});
+	}
+	,
+    show=function(elem){            	
+    	each(elem,function(){
+    		this.style.display="block";
+    	});
+    };
+//dom ready event
+var readylist=[],
+	ready=false,
+	loadedReg=/^(loaded|complete)$/;
+var readyHandle = function () { 
+	if(ready) return;  
+	for (var i = 0; i < readylist.length; i++) readylist[i]&&readylist[i].call(document);
+	ready=true;
+	readylist=null;   
+};
+var DOMContentLoaded = function(){
+	if (document.addEventListener) {
+		document.removeEventListener('DOMContentLoaded', DOMContentLoaded, false); 
+		readyHandle(); 			
+	}else{		
+		if(loadedReg.test(document.readyState)){
+			document.detachEvent('onreadystatechange',DOMContentLoaded);
+			readyHandle();
+		}
+	}
+};
+var DOMReady = function (fn){ 
+
+		if(document.readyState==='complete'){readyHandle();return;}	
+
+		if (readylist.push(fn) > 1) return; 
+
+		if (document.addEventListener) {
+			document.addEventListener('DOMContentLoaded', DOMContentLoaded, false);  			
+			window.addEventListener('loaded', readyHandle, false);  
+		}else if(document.attachEvent){
+			document.attachEvent('onreadystatechange',DOMContentLoaded);
+			window.attachEvent('onload',readyHandle);
+		} 			
+			 	  
+}; 
+// slide.js  has slideUp and slideDown 
+var slider=(function(elem,speed){
+	var timerId=null,list=[];			
+    var slider=function(elem, speed){
+	    
+		this.elem=elem;
+		this.speed=speed||300;			
+		this.height=elem.clientHeight;
+		elem.style.height=0;  									
+	};
+	slider.prototype.slideDown=function(callback){
+	   var _this=this, elem=_this.elem,speed=_this.speed,
+		   start=elem.clientHeight,end=_this.height;
+
+	    elem.style.display ="block"; 
+	    _this.fx=new Fx(elem,speed,start,end,callback);
+		list.push(_this.fx);			
+	};
+	slider.prototype.slideUp=function(callback){
+	   var _this=this, elem=_this.elem,speed=_this.speed,
+		   start=elem.clientHeight,end=0;
+		_this.fx=new Fx(elem,speed,start,end,callback);
+		list.push(_this.fx);
+	};
+	slider.prototype.stop=function(){
+		this.fx&&this.fx.stop();
+	};
+	var Fx=function(elem,speed,start,end,callback){
+		this.elem=elem;
+		this.start=start;
+		this.startTime=new Date().getTime();
+		this.speed=speed;
+		this.end=end;
+		this.callback=callback;
+			
+		if(!list.length&&!timerId){
+			timerId=setInterval(function(){
+				for(var i=0;i<list.length;i++){							
+					list[i].step&&list[i].step();
+				}
+				if(!list.length){
+					clearInterval(timerId);
+					timerId=null;
+				}
+			},13);
+		}
+	};
+
+ 	Fx.prototype.step=function(){
+	   var _this=this,start=_this.start,end=_this.end,
+	   	   p=(new Date().getTime()-_this.startTime)/_this.speed,
+		   swing=(-(Math.cos(p*Math.PI)/2) + 0.5),
+		   gap=end-start;
+		if(p<1){   
+			_this.elem.style.height=start+(gap*swing)+'px';	
+		}else{//动画结束					
+			_this.elem.style.height=end+'px';
+			_this.callback&&_this.callback(); //执行callback
+			_this.stop();
+		}
+	};
+	//停止动画
+	Fx.prototype.stop=function(){
+		var i=0;
+		for(;i<list.length;i++){
+			if(list[i]===this){
+				list.splice(i--,1);//移除动画
+			}
+		}
+	};
+	return slider;
+})();
+//instreet object
+var instreet={
+	container :null,
+	shop:null,
+	weibo:null,
+	wiki:null,
+	widgetBox :null,
+    init   :function(){
+	    var cssUrl=config.cssurl;
+		ev.importFile('css',cssUrl);
+		instreet.createContainer();
+		instreet.bindEvents();
+						
+	},
+	createContainer: function(){						//创建广告容器
+       var container=document.createElement('div');        
+	   container.id="instreet-plugin-container";
+	   instreet.container=container;
+	   document.body.insertBefore(container,document.body.firstChild);	
+	   instreet.createWidgetBox();			
+	},
+	createWidgetBox:function(){
+	     
+	    var	section=document.createDocumentFragment(),
+	        shop=document.createElement("div"),weibo=document.createElement("div"),wiki=document.createElement("div");
+	    shop.className="shop-holder";
+	    weibo.className="weibo-holder";
+	    wiki.className="wiki-holder";
+
+	    section.appendChild(shop);
+	    section.appendChild(weibo);
+	    section.appendChild(wiki);
+		instreet.container.appendChild(section);
+		instreet.shop=shop;instreet.weibo=weibo;instreet.wiki=wiki;
+
+	},
+	bindEvents :function(){
+
+		var	shop=instreet.shop,
+			weibo=instreet.weibo,
+			wiki=instreet.wiki,
+			index;
+		instreet.container.onclick=function(e){
+			var event=ev.getEvent(e),
+				tar=ev.getTarget(event);
+			if(tar.className=="button-close-holder"){
+				hide(tar.parentNode.parentNode);
+			}
+		};
+		shop.onmouseover=function(e){
+			instreet.enterApp(e,this.insId,this);
+		};
+		shop.onmouseout=function(e){
+			instreet.leaveApp(e,this.insId,this);					
+		};
+		weibo.onmouseover=function(e){
+			instreet.enterApp(e,this.insId,this);
+		};
+		weibo.onmouseout=function(e){
+			instreet.leaveApp(e,this.insId,this);
+		};
+		wiki.onmouseover=function(e){
+			instreet.enterApp(e,this.insId,this);
+		};
+		wiki.onmouseout=function(e){
+			instreet.leaveApp(e,this.insId,this);
+		};
+
+	},
+	hideApps  :function(){          //隐藏所有app
+		hide(instreet.shop);
+		hide(instreet.weibo);
+		hide(instreet.wiki);
+		instreet.blurSpot();
+	},
+	blurSpot :function(){
+		var f=$('ins-spot-focus');
+		if(f){
+			f.id='';
+		}
+	},
+	enterApp  :function(e,index,app){
+		var event=ev.getEvent(e),
+			rela=ev.getRelatedTarget(event),
+			ad=cache.adsArray[index];							
+		ad.showWidget();
+		
+		if(!app.contains(rela)){
+			show(app);			
+			ad.recordWatch(app);
+		}
+	},
+	leaveApp  :function(e,index,app){
+		var event=ev.getEvent(e),
+			rela=ev.getRelatedTarget(event),
+			ad=cache.adsArray[index];	
+		ad.hideWidget();
+					
+		if(!instreet.container.contains(rela)){
+			hide(app);			
+			instreet.blurSpot();	
+			if(rela!==ad.img){
+				ad.hideAd();
+			}			
+		}
+	},
+	recordImage:function(img){
+      var iu=encodeURIComponent(encodeURIComponent(img.src)),
+	       pd=config.widgetSid,
+		   t=encodeURIComponent(encodeURIComponent(document.title)),
+		   ul=config.ourl;
+
+	  var time=new Date().getTime();   
+	  ul+="?iu="+iu+"&pd="+pd+"&t="+t+"&time="+time;
+	  ev.importFile('js',ul);
+
+	}
+
+};
+//InstreetAd Class
+var spot_index=29999999;
 var InstreetAd=function(data){			
 	var img=imgs[data.index];
 	this.data=data;
@@ -38,7 +514,7 @@ InstreetAd.prototype={
 			icons_top,
 			imgW=img.offsetWidth,
 			imgH=img.offsetHeight,pad=2;
-        var dis=_.data.badsSpot.length?"none":"block";
+        // var dis=_.data.badsSpot.length?"none":"block";
   //       if(config.position==1){    //logo图标放在左侧
   //       	icons_left=pos.x+pad+"px;";
   //       }else if(config.position==0){	//logo图标放在右侧
@@ -46,7 +522,12 @@ InstreetAd.prototype={
   //       }				
 		// icons_top=pos.y+imgH-icons.offsetHeight+"px;";					
 		// icons.style.cssText="left:"+icons_left+"top:"+icons_top+"display:"+dis;
-		
+						
+		if(ad){	// locate底部广告
+			var adW=ad.lastChild.offsetWidth,adH=100;
+			var dis=ad.style.display?'display:'+ad.style.display+';':'';
+			ad.style.cssText=dis+"left:"+(pos.x+(imgW-adW)/2)+"px;top:"+(pos.y+imgH-adH)+"px;width:"+adW+"px;height:"+adH+"px";
+		}
 		for(var len=spots.length,i=0;i<len;i++){               //定位spot
 			var spot=spots[i];
 			var coor=_.getCoor(spot);
@@ -94,6 +575,7 @@ InstreetAd.prototype={
 			// icons=_.icons,
 			// shareIcon=icons.lastChild.children[1];
 		//box onclick
+		/*
 		box.onclick=function(e){
 			var event=ev.getEvent(e),tar=ev.getTarget(event);
 			if(tar.className=="icon-logo"){
@@ -126,7 +608,16 @@ InstreetAd.prototype={
 				}
 			}
 		};
-
+		
+		//share icon mouseover
+		shareIcon.onmouseover=function(){
+			show(this.lastChild);
+		};	
+		share icon mouseout
+		shareIcon.onmouseout=function(){
+			hide(this.lastChild);
+		};	
+		*/
 		//adbox onclick
 		if(typeof ad!="undefined"){
 			ad.onclick=function(e){
@@ -143,10 +634,11 @@ InstreetAd.prototype={
 				}
 			}
 		};
-
+		
 		//box mouseover
 		box.onmouseover=function(e){
-			var event=ev.getEvent(e),rela=ev.getRelatedTarget(event);
+			var event=ev.getEvent(e),
+				rela=ev.getRelatedTarget(event);
 			!_.stopMouseover&&_.showWidget();
 			if(rela!==img){
 				!_.stopMouseover&&_.showAd();
@@ -154,24 +646,19 @@ InstreetAd.prototype={
 		};
 		//box mouseout
 		box.onmouseout=function(e){
-			var event=ev.getEvent(e),rela=ev.getRelatedTarget(event);
+			var event=ev.getEvent(e),
+				rela=ev.getRelatedTarget(event);
 			_.hideWidget();
 			if(!instreet.container.contains(rela)&&rela!==img){
 				_.hideAd();
 			}
 		};
 
-		//share icon mouseover
-		// shareIcon.onmouseover=function(){
-		// 	show(this.lastChild);
-		// };	
-		//share icon mouseout
-		// shareIcon.onmouseout=function(){
-		// 	hide(this.lastChild);
-		// };	
+
 		//img mouseover
 		ev.bind(img,"mouseover",function(e){
-			var event=ev.getEvent(e),rela=ev.getRelatedTarget(event);	
+			var event=ev.getEvent(e),
+				rela=ev.getRelatedTarget(event);	
 			!_.stopMouseover&&_.showWidget();			
 			if(!instreet.container.contains(rela)){
 				_.recordShow(10);
@@ -180,27 +667,32 @@ InstreetAd.prototype={
 		});
 		//img mouseout
 		ev.bind(img,"mouseout",function(e){
-			var event=ev.getEvent(e),rela=ev.getRelatedTarget(event);
+			var event=ev.getEvent(e),
+				rela=ev.getRelatedTarget(event);
 			_.hideWidget();
-		    !box.contains(rela)&&instreet.hideApps();
+
 			if(!instreet.container.contains(rela)){
+				instreet.hideApps();
 				_.hideAd();
 			}
 
 		});
 		//spotsHolder mouseover
 		spotHolder.onmouseover=function(e){
-			var event=ev.getEvent(e),tar=ev.getTarget(event);
+			var event=ev.getEvent(e),
+				tar=ev.getTarget(event);
 			if(tar.className=="instreet-spot-shop"&&instreet.shop.display!=="block"){
 				_.recordShow(9,tar);
 			}
-			var f=document.getElementById('ins-spot-focus');
+			var f=$('ins-spot-focus');
 			if(f){
-				f.id='';
+				if(f===tar)
+					return;
+				f.id='';				
 			}
-			tar.id='ins-spot-focus';			
 			instreet.hideApps();
 			_.showApp(tar);
+			tar.id='ins-spot-focus';						
 		};
 
 		
@@ -254,6 +746,17 @@ InstreetAd.prototype={
 		   this.spotHolder.appendChild(spot);
 	   }
 	    			
+	},
+	getSpotByMetrix: function(metrix){	//查找spot
+		var spots=this.spotsHolder.children,
+			len=spots.length;
+	
+		for(var i=0;i<len;i++){
+			if(spots[i].metrix==metrix){
+				return spots[i];
+			}
+		}
+		return null;
 	},
 	createAd :function(){
 		var _=this,data=_.data,index=data.index,img=_.img,
@@ -313,28 +816,39 @@ InstreetAd.prototype={
 		return {top:(y+pos.y),left:(x+pos.x)};	
         
 	},
-	showWidget    :function(){
+	showWidget   :function(){
 		var _=this,
 			spots=_.spotHolder;
 			// icons=_.icons;
-		// show(icons.lastChild);
-		spots.children.length&&show(spots.children);
+		// show(icons.lastChild);		
 		// icons.style.zIndex=100000;
+		spots.children.length&&show(spots.children);
+		if($('ins-spot-focus')){
+			$('ins-spot-focus').style.zIndex=spot_index;
+		}
 	},
-	hideWidget    :function(){
+	hideWidget   :function(){
 		var _=this,
 			spots=_.spotHolder;
 			// icons=_.icons;
-		// hide(icons.lastChild);
-		spots.children.length&&hide(spots.children);
+		// hide(icons.lastChild);		
 		// icons.style.zIndex=99999;
+		spots.children.length&&hide(spots.children);
+		if($('ins-spot-focus')){
+			$('ins-spot-focus').style.zIndex=0;
+		}
 	},
-	showAd        :function(){
-		var _=this,ad=_.ad,img=_.img,pos=ev.getXY(img),
-			imgW=img.offsetWidth,imgH=img.offsetHeight;
+	showAd   :function(){
+		var _=this,
+			ad=_.ad,
+			img=_.img,
+			pos=ev.getXY(img),
+			imgW=img.offsetWidth,
+			imgH=img.offsetHeight;
 		if(ad&&ad.style.display!="block"){
 			show(ad);
-			var adW=ad.lastChild.offsetWidth,adH=100;
+			var adW=ad.lastChild.offsetWidth,
+				adH=100;
 			ad.style.cssText="display:block;left:"+(pos.x+(imgW-adW)/2)+"px;top:"+(pos.y+imgH-adH)+"px;width:"+adW+"px;height:"+adH+"px";
 			if(!_.slider){  //如果不存在slider对象则初始化一个
 				_.adClosed=true;
@@ -367,7 +881,8 @@ InstreetAd.prototype={
 			size=13;
 
 		headIntro="<div class='cont-head'>";
-		headOutro="<a class='button-close-holder' href='javascript:;' title='关闭'>×</a></div>";	
+		headOutro="<a class='button-close-holder' href='javascript:;' title='关闭'>×</a></div>";
+		
 		switch(cn){
 			case "instreet-spot-shop":
 				var adId=0,
@@ -375,11 +890,10 @@ InstreetAd.prototype={
 					leftStr='',
 					leftClass='left',
 					priceStr='';
-				appBox=instreet.shop;				
-				appBox.style.cssText="left:"+(pos.x+size)+"px;top:"+(pos.y+size)+"px;display:block";				
-				if(appBox.metrix==metrix)
-					return;
-
+				appBox=instreet.shop;								
+				if(appBox.metrix==metrix){	//app已经展示则跳出
+					break;
+				}				
 				appBox.metrix=metrix;
 				appBox.insId=_.img.insId;   //标记app属于哪张图片
 			    for(var i=0,len=data.adsSpot.length;i<len;i++){
@@ -407,10 +921,10 @@ InstreetAd.prototype={
 				break;
 
 			case "instreet-spot-weibo":
-				appBox=instreet.weibo;
-				appBox.style.cssText="left:"+(pos.x+size)+"px;top:"+(pos.y+size)+"px;display:block";//显示该app
-				if(appBox.metrix==metrix)
-					return;
+				appBox=instreet.weibo;				
+				if(appBox.metrix==metrix){	//app已经展示则跳出
+					break;
+				}					
 				appBox.metrix=metrix;
 				appBox.insId=_.img.insId; 
 			    for(var i=0,len=data.weiboSpot.length;i<len;i++){
@@ -422,7 +936,7 @@ InstreetAd.prototype={
 					 latestStatus=app.latestStatus,
 				     redUrl=config.redurl+"?tty=1&mid="+data.imageNumId+"&muh="+data.imageUrlHash+"&pd="+data.widgetSid+"&ift="+app.type+"&at=&ad=&tg="+encodeURIComponent(encodeURIComponent(title))+"&rurl="+encodeURIComponent(encodeURIComponent(app.userUrl));
 				if(app.metrix==metrix){
-				  str=headIntro+'<a class="thumb" target="_blank" href="'+redUrl+'" title="'+nickName+'"><img src="'+avatar+'"/></a><div class="head-right"><a class="nickname" target="_blank" href="'+redUrl+'"">'+nickName+'</a><div class="icon"><a target="_blank" href="'+redUrl+'" title="微博"><img src="'+icon+'"/></a></div></div>'+headOutro;
+				  str=headIntro+'<a class="thumb" target="_blank" href="'+redUrl+'" ><img src="'+avatar+'"/></a><div class="head-right"><a class="nickname" target="_blank" href="'+redUrl+'"">'+nickName+'</a><div class="icon"><a target="_blank" href="'+redUrl+'" title="'+nickName+'的微博"><img src="'+icon+'"/></a></div></div>'+headOutro;
 				  str+='<div class="cont-body clearfix"><p class="summary">'+latestStatus+'</p></div>';
 			    }
 			   }
@@ -430,10 +944,10 @@ InstreetAd.prototype={
 			   break;
 
 		   case "instreet-spot-wiki":
-			   appBox=instreet.wiki;
-			   appBox.style.cssText="left:"+(pos.x+size)+"px;top:"+(pos.y+size)+"px;display:block";//显示该app
-				if(appBox.metrix==metrix)
-					return;
+			    appBox=instreet.wiki;			  
+				if(appBox.metrix==metrix){	//app已经展示则跳出
+					break;
+				}
 				appBox.metrix=metrix;
 				appBox.insId=_.img.insId; 
 				for(var i=0,len=data.wikiSpot.length;i<len;i++){
@@ -444,15 +958,14 @@ InstreetAd.prototype={
 				     redUrl=config.redurl+"?tty=1&mid="+data.imageNumId+"&muh="+data.imageUrlHash+"&pd="+data.widgetSid+"&ift="+app.type+"&at=&ad=&tg="+encodeURIComponent(encodeURIComponent(title))+"&rurl="+encodeURIComponent(encodeURIComponent(app.url));
 			     if(app.metrix==metrix){
 			     str=headIntro+'<div class="h1-title"><a class="nickname" target="_blank" href="'+redUrl+'">'+title+'</a></p></div>'+headOutro;
-				 str+="<div class='cont-body'><div class='left'><a class='thumb' target='_blank' href='"+redUrl+"' title='"+title+"'><img src='"+firstimg+"'/></a></div><div class='right'><p class='summary'>"+summary+"</p><p class='icon'><a target='_blank' href='"+redUrl+"' title='互动百科'><img src='http://static.instreet.cn/widgets/push/images/icon-baike.png'/></a></p></div></div>";
+				 str+="<div class='cont-body'><div class='left'><a class='thumb' target='_blank' href='"+redUrl+"' ><img src='"+firstimg+"'/></a></div><div class='right'><p class='summary'>"+summary+"</p><p class='icon'><a target='_blank' href='"+redUrl+"' title='互动百科'><img src='http://static.instreet.cn/widgets/push/images/icon-baike.png'/></a></p></div></div>";
 				 }
 			   }
 			   appBox.innerHTML=str;
 		   break;
 		
 		}
-
-
+		appBox.style.cssText="left:"+(pos.x+size)+"px;top:"+(pos.y+size)+"px;display:block;";							
 	},
    //鼠标移动到图片的时候发送展现记录
    recordShow: function(flag,spot){  
@@ -564,3 +1077,49 @@ InstreetAd.reLocate =function(){                   //重新定位广告
  	
     }
 };
+	//jsonp callback
+	window['insjsonp']=function(data){
+		if(data){
+		  var index=data.index,img=imgs[index];
+		  img.setAttribute('instreet-data-ready',true);
+		  cache.adsArray[index]=new InstreetAd(data);
+		   if(config.footAuto){
+		   	 var ad=cache.adsArray[index];
+		   	 ad.showAd();
+		   	 ad.ad&&ad.recordShow(9,null);
+		   }
+		}
+			
+	};
+		
+    //TimerTick 方法
+    var TimerTick=(function(){
+    	var timerId=null;   //全局时间函数计时器
+    	return function(arr){
+             timerId=setInterval(function(){
+	         	 for(var i=0;i<arr.length;i++){
+					arr[i]&&arr[i].detect();
+	         	 }
+             },1000);
+    	};
+    })();
+    //插件初始化
+    var init=function(){
+
+	 	if(typeof instreet_config!="undefined"){		//extend config
+			 extendConfig(instreet_config);
+		 }                  
+	     instreet.init();
+		 cache.initData();
+		 ev.bind(window,'resize',function(){InstreetAd.reLocate();}); 
+		 //dom ready后搜索是否有新的图片
+		 // document.DomReady(function(){
+		 // 		instreet.search()
+		 // });
+		 //定时检测图片是否变化
+         TimerTick(cache.adsArray);
+	};
+	DOMReady(function(){
+		init();
+	});
+})(window);

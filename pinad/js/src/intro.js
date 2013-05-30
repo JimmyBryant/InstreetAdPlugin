@@ -6,7 +6,7 @@
 		return;
 	}
 	var widget=window.InstreetImageWidget={
-		name :'default',
-		theme:'white',
-		version:'0.2.0'
+		name :'pinad',
+		theme:'default',
+		version:'0.0.1'
 	};

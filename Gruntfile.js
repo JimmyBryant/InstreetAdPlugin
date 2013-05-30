@@ -31,9 +31,9 @@ module.exports = function(grunt) {
 
 		    },
 		    dist: {
-		      src: ['default/js/src/intro.js','default/js/src/config.js','default/js/src/cache.js','default/js/src/util-ev.js','default/js/src/ready.js', 
-		      		'default/js/src/slide.js','default/js/src/util-instreet.js','default/js/src/module.js', 'default/js/src/outro.js'],
-		      dest: 'default/js/dist/instreet.default.js'
+		      src: ['pinad/js/src/intro.js','pinad/js/src/config.js','pinad/js/src/cache.js','pinad/js/src/util-ev.js','pinad/js/src/ready.js', 
+		      		'pinad/js/src/slide.js','pinad/js/src/util-instreet.js','pinad/js/src/module.js', 'pinad/js/src/outro.js'],
+		      dest: 'pinad/js/dist/instreet.pinad.js'
 		    }
 		  }
 

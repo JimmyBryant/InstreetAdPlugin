@@ -581,6 +581,12 @@
 		        }				
 				icons_top=pos.y+imgH-icons.offsetHeight+"px;";					
 				icons.style.cssText="left:"+icons_left+"top:"+icons_top+"display:"+dis;
+				// locate底部广告
+				if(ad){
+					var adW=ad.lastChild.offsetWidth,adH=100;
+					var dis=ad.style.display?'display:'+ad.style.display+';':'';
+					ad.style.cssText=dis+"left:"+(pos.x+(imgW-adW)/2)+"px;top:"+(pos.y+imgH-adH)+"px;width:"+adW+"px;height:"+adH+"px";
+				}
 				
 				for(var len=spots.length,i=0;i<len;i++){               //定位spot
 					var spot=spots[i];
@@ -590,8 +596,11 @@
 			},
 			detect   :function(){                     //每隔一段时间开始检测图片对象是否change
 
-                var _this=this,img=_this.img,origin=_this.originInfo,
-                	side=_this.sideWrapper,pos=ev.getXY(img);
+                var _this=this,
+                	img=_this.img,
+                	origin=_this.originInfo,
+                	side=_this.sideWrapper,
+                	pos=ev.getXY(img);
 
                 if(img.src&&img.src!=origin.src){
                     var parent=side.parentNode||document.body;

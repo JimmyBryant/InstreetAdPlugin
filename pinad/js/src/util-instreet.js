@@ -36,49 +36,31 @@ var instreet={
 	},
 	bindEvents :function(){
 
-		var	shop=instreet.shop,weibo=instreet.weibo,wiki=instreet.wiki,index;
+		var	shop=instreet.shop,
+			weibo=instreet.weibo,
+			wiki=instreet.wiki,
+			index;
 		instreet.container.onclick=function(e){
-			var event=ev.getEvent(e),tar=ev.getTarget(event);
+			var event=ev.getEvent(e),
+				tar=ev.getTarget(event);
 			if(tar.className=="button-close-holder"){
 				hide(tar.parentNode.parentNode);
 			}
 		};
 		shop.onmouseover=function(e){
-			index=this.insId;
-			var event=ev.getEvent(e),rela=ev.getRelatedTarget(event),
-				ad=cache.adsArray[index];					
-			ad.showWidget();
-			show(this);
-			if(!instreet.shop.contains(rela)){
-				ad.recordWatch(this);
-			}
-
+			instreet.enterApp(e,this.insId,this);
 		};
 		shop.onmouseout=function(e){
 			instreet.leaveApp(e,this.insId,this);					
 		};
 		weibo.onmouseover=function(e){
-			index=this.insId;
-			var event=ev.getEvent(e),rela=ev.getRelatedTarget(event),
-				ad=cache.adsArray[index];					
-			ad.showWidget();
-			show(this);
-			if(!instreet.weibo.contains(rela)){
-				ad.recordWatch(this);
-			}
+			instreet.enterApp(e,this.insId,this);
 		};
 		weibo.onmouseout=function(e){
 			instreet.leaveApp(e,this.insId,this);
 		};
 		wiki.onmouseover=function(e){
-			index=this.insId;
-			var event=ev.getEvent(e),rela=ev.getRelatedTarget(event),
-				ad=cache.adsArray[index];					
-			ad.showWidget();
-			show(this);
-			if(!instreet.wiki.contains(rela)){
-				ad.recordWatch(this);
-			}
+			instreet.enterApp(e,this.insId,this);
 		};
 		wiki.onmouseout=function(e){
 			instreet.leaveApp(e,this.insId,this);
@@ -89,23 +71,37 @@ var instreet={
 		hide(instreet.shop);
 		hide(instreet.weibo);
 		hide(instreet.wiki);
+		instreet.blurSpot();
+	},
+	blurSpot :function(){
+		var f=$('ins-spot-focus');
+		if(f){
+			f.id='';
+		}
 	},
 	enterApp  :function(e,index,app){
-		var event=ev.getEvent(e),rela=ev.getRelatedTarget(e),
-			ad=cache.adsArray[index];					
+		var event=ev.getEvent(e),
+			rela=ev.getRelatedTarget(event),
+			ad=cache.adsArray[index];							
 		ad.showWidget();
-		show(app);
-		if(!instreet.shop.contains(rela)){
+		
+		if(!app.contains(rela)){
+			show(app);			
 			ad.recordWatch(app);
 		}
 	},
 	leaveApp  :function(e,index,app){
-		var event=ev.getEvent(e),rela=ev.getRelatedTarget(event);
-		var ad=cache.adsArray[index];	
+		var event=ev.getEvent(e),
+			rela=ev.getRelatedTarget(event),
+			ad=cache.adsArray[index];	
 		ad.hideWidget();
-		hide(app);				
-		if(!instreet.container.contains(rela)&&rela!==ad.img){
-			ad.hideAd();
+					
+		if(!instreet.container.contains(rela)){
+			hide(app);			
+			instreet.blurSpot();	
+			if(rela!==ad.img){
+				ad.hideAd();
+			}			
 		}
 	},
 	recordImage:function(img){
