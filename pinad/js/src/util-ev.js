@@ -42,39 +42,39 @@ var	ev = {
 			return null;
 		}
 	},
-	getXY : function (obj){
-			var x = 0, y = 0;
-			if (obj.getBoundingClientRect) {
-				var box = obj.getBoundingClientRect();
-				var D = document.documentElement;
-				x = box.left + Math.max(D.scrollLeft, document.body.scrollLeft) - D.clientLeft;
-				y = box.top + Math.max(D.scrollTop, document.body.scrollTop) - D.clientTop;
-			} else {
-				for (; obj != document.body; x += obj.offsetLeft, y += obj.offsetTop, obj = obj.offsetParent) {  }
-			};
-			return {  x: x,  y: y };
+	getXY :function (obj){
+		var x = 0, y = 0;
+		if (obj.getBoundingClientRect) {
+			var box = obj.getBoundingClientRect();
+			var D = document.documentElement;
+			x = box.left + Math.max(D.scrollLeft, document.body.scrollLeft) - D.clientLeft;
+			y = box.top + Math.max(D.scrollTop, document.body.scrollTop) - D.clientTop;
+		} else {
+			for (; obj != document.body; x += obj.offsetLeft, y += obj.offsetTop, obj = obj.offsetParent) {  }
+		}
+		return {  x: x,  y: y };
 	},
-	aTrim          :function(arr){	       
-		   var array=new Array();
-		   arr.sort(sortNum);
-		   var len=arr.length,flag=0;
-		   for(var i=0;i<len;i++){
-			   if(arr[i]!=arr[i+1]){
-				 array[flag]=arr[i];
-				 flag++;
-			  }
-		   }
-		   return array;
-		   function sortNum(a,b){return a-b;}
+	aTrim	:function(arr){
+		var array=[];
+		arr.sort(sortNum);
+		var len=arr.length,flag=0;
+		for(var i=0;i<len;i++){
+			if(arr[i]!=arr[i+1]){
+				array[flag]=arr[i];
+				flag++;
+			}
+		}
+		return array;
+		function sortNum(a,b){return a-b;}
 	},
-    $:  function(parentNode,tagName,className){  
-    		   
-		var parent=parentNode||document,tag;
+	$	:function(parentNode,tagName,className){  
+		var parent=parentNode||document,
+			tag;
 		if(arguments.length==2){  
-			  className=tagName;
-			  tag="*";
+			className=tagName;
+			tag="*";
 		}else{
-		  var tag=tagName||'*';
+			tag=tagName||'*';
 		}
 		if(document.getElementsByClassName) return parent.getElementsByClassName(className);
 		var arr=[];
@@ -94,26 +94,27 @@ var	ev = {
 		 var link,script,
 		 head=document.getElementsByTagName( "head" )[0] || document.documentElement;
 		 switch(type){
-		   case "js": 
-		   script=document.createElement('script');
-		   script.async="async";script.charset="utf-8";
-		   script.type="text/javascript";
-		   script.onload = script.onreadystatechange = function () {
-		   		if(!script.readyState || script.readyState === "loaded" || script.readyState === "complete"){
-		   			script.onload = script.onreadystatechange = null;  
-					if ( head && script.parentNode ) {
-							head.removeChild( script );
+			case "js":
+				script=document.createElement('script');
+				script.async="async";
+				script.charset="utf-8";
+				script.type="text/javascript";
+				script.onload=script.onreadystatechange=function() {
+					if(!script.readyState || script.readyState === "loaded" || script.readyState === "complete"){
+						script.onload = script.onreadystatechange = null;  
+						if ( head && script.parentNode ) {
+								head.removeChild( script );
+						}
 					}
-		   		}
-		   };
-		   script.src=name;
-		   head.appendChild(script);
-		   break;
-		   case "css":
-		   link = document.createElement("link");link.type = "text/css";link.rel = "stylesheet";
-		   link.href=name;
-		   head.appendChild(link);
-		   break;					   
+				};
+				script.src=name;
+				head.appendChild(script);
+				break;
+			case "css":
+				link = document.createElement("link");link.type = "text/css";link.rel = "stylesheet";
+				link.href=name;
+				head.appendChild(link);
+				break;					   
 		 }
 	},
 	hasClass:function(obj,c){
@@ -131,24 +132,24 @@ var	ev = {
 
 var $=function(id){return document.getElementById(id);}	//simplify document.getElementById
 	,
-    each=function(arrs,handler){
-    	if(arrs.length){
-    		for(var i=0,len=arrs.length;i<len;i++){
-    			handler.call(arrs[i],i);
-    		}
-    	}else{
-    		arrs&&handler.call(arrs,0);
-    	}
-    }
-    ,
-    hide=function(elem){
-    	each(elem,function(){
-    		this.style.display="none";
-    	});
+	each=function(arrs,handler){
+		if(arrs.length){
+			for(var i=0,len=arrs.length;i<len;i++){
+				handler.call(arrs[i],i);
+			}
+		}else{
+			arrs&&handler.call(arrs,0);
+		}
 	}
 	,
-    show=function(elem){            	
-    	each(elem,function(){
-    		this.style.display="block";
-    	});
-    };
+	hide=function(elem){
+		each(elem,function(){
+			this.style.display="none";
+		});
+	}
+	,
+	show=function(elem){
+		each(elem,function(){
+			this.style.display="block";
+		});
+	};

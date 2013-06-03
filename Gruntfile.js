@@ -8,30 +8,42 @@ module.exports = function(grunt) {
 		 		browser: true,
 		 		evil:true,
 		 		laxcomma:true,
-		 		scripturl:true
-		 	},		 			 	
-		 	src:['default/js/src/*.js']
+		 		scripturl:true,
+		 		smarttabs:true,
+		 		expr:true
+		 	},
+		 	src:['pinad/js/dist/instreet.pinad.js']
 		 },
 		 uglify: {
-			options: {			    
+			options: {
 				banner: '/*!<%= grunt.template.today("yyyy-mm-dd") %> */\n'
 			},
-			'default':{
-				options: {			    
-					banner: '/*!default.js <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+			pinad:{
+				options: {
+					banner: '/*!pinad.js <%= grunt.template.today("yyyy-mm-dd") %> */\n'
 				},
 				files: {
-				  'default/js/instreet.default.min.js': ['default/js/instreet.default.js'],
+				  'pinad/js/dist/instreet.pinad.min.js': ['pinad/js/dist/instreet.pinad.js'],
 				}
 			}
-			  		  
+
+		  },
+		  cssmin:{
+		  	minify:{
+		  		options: {
+			    	banner: '/* minified css file */'
+			    },
+			    files:{
+			    	'pinad/css/instreet.pinad.min.css':'pinad/css/instreet.pinad.css'
+			    }
+		  	}
 		  },
 		  concat:{
 		  	options: {
 
 		    },
 		    dist: {
-		      src: ['pinad/js/src/intro.js','pinad/js/src/config.js','pinad/js/src/cache.js','pinad/js/src/util-ev.js','pinad/js/src/ready.js', 
+		      src: ['pinad/js/src/intro.js','pinad/js/src/config.js','pinad/js/src/cache.js','pinad/js/src/util-ev.js','pinad/js/src/ready.js',
 		      		'pinad/js/src/slide.js','pinad/js/src/util-instreet.js','pinad/js/src/module.js', 'pinad/js/src/outro.js'],
 		      dest: 'pinad/js/dist/instreet.pinad.js'
 		    }
@@ -42,6 +54,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-concat');
-	grunt.registerTask('default',['jshint','uglify']);
-	
+	grunt.loadNpmTasks('grunt-contrib-cssmin');
+	grunt.registerTask('default',['concat','jshint','uglify','cssmin']);
+
 };

@@ -6,19 +6,25 @@ var slider=(function(elem,speed){
 		this.elem=elem;
 		this.speed=speed||300;			
 		this.height=elem.clientHeight;
-		elem.style.height=0;  									
+		elem.style.height=0;
 	};
 	slider.prototype.slideDown=function(callback){
-	   var _this=this, elem=_this.elem,speed=_this.speed,
-		   start=elem.clientHeight,end=_this.height;
+		var _this=this,
+			elem=_this.elem,
+			speed=_this.speed,
+			start=elem.clientHeight,
+			end=_this.height;
 
-	    elem.style.display ="block"; 
+	    elem.style.display ="block";
 	    _this.fx=new Fx(elem,speed,start,end,callback);
-		list.push(_this.fx);			
+		list.push(_this.fx);
 	};
 	slider.prototype.slideUp=function(callback){
-	   var _this=this, elem=_this.elem,speed=_this.speed,
-		   start=elem.clientHeight,end=0;
+		var _this=this,
+			elem=_this.elem,
+			speed=_this.speed,
+			start=elem.clientHeight,
+			end=0;
 		_this.fx=new Fx(elem,speed,start,end,callback);
 		list.push(_this.fx);
 	};
@@ -46,11 +52,13 @@ var slider=(function(elem,speed){
 		}
 	};
 
- 	Fx.prototype.step=function(){
-	   var _this=this,start=_this.start,end=_this.end,
-	   	   p=(new Date().getTime()-_this.startTime)/_this.speed,
-		   swing=(-(Math.cos(p*Math.PI)/2) + 0.5),
-		   gap=end-start;
+	Fx.prototype.step=function(){
+		var _this=this,
+			start=_this.start,
+			end=_this.end,
+			p=(new Date().getTime()-_this.startTime)/_this.speed,
+			swing=(-(Math.cos(p*Math.PI)/2) + 0.5),
+			gap=end-start;
 		if(p<1){   
 			_this.elem.style.height=start+(gap*swing)+'px';	
 		}else{//动画结束					
