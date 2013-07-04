@@ -1,3 +1,17 @@
+	// load image action的回调
+	window.ins_image_jsonp=function(data){
+		if(data&&data.image_context_sensi===true){
+			return;
+		}
+		var clientImg=imgs[data.index];
+		if(typeof config.adsLimit=="number"&&config.adsLimit<=0){
+			return;
+		}
+		clientImg.setAttribute('instreet_data_loading',true);	//标记开始请求该图片的广告数据
+		clientImg.insDataLoading= true;
+		cache.createJsonp(clientImg);
+		config.adsLimit&&config.adsLimit--;
+	};
 	//jsonp callback
 	window.insjsonp=function(data){
 		if(data){
@@ -13,8 +27,8 @@
 		}
 	};
 
-    //TimerTick 方法
-    var TimerTick=(function(){
+	//TimerTick 方法
+	var TimerTick=(function(){
 		var timerId=null;   //全局时间函数计时器
 		return function(arr){
 			timerId=setInterval(function(){
@@ -23,9 +37,9 @@
 				}
 			},1000);
 		};
-    })();
-    //插件初始化
-    var init=function(){
+	})();
+	//插件初始化
+	var init=function(){
 
 		if(typeof instreet_config!="undefined"){		//extend config
 			extendConfig(instreet_config);

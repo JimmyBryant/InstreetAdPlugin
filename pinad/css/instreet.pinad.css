@@ -400,7 +400,7 @@
     left: 0;
     background: url("../images/loading-default.gif") no-repeat scroll center center #FFFFFF;
   }
-  #instreet-plugin-container .ad-holder  .imgbox{display: inline-block;*zoom:1;background: url(../images/loading-default.gif) no-repeat center center;}
+  #instreet-plugin-container .ad-holder  .imgbox{display:block;background: url(../images/loading-default.gif) no-repeat center center;line-height:0;}
   #instreet-plugin-container .ad-holder  .imgbox img.adimg{max-height: 100px;_height:expression(this.width >100 ? "100px" : true);}
   #instreet-plugin-container .ad-holder .ad-cont .black-bg{
     background: url("../images/bg.png") repeat-x scroll 0 0 transparent;

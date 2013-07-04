@@ -1,5 +1,5 @@
 //function util
-var	ev = {                  
+var	ev = {
 	bind : function(element,type,handler){
 		if(element.addEventListener){
 			element.addEventListener(type,handler,false);
@@ -67,10 +67,10 @@ var	ev = {
 		return array;
 		function sortNum(a,b){return a-b;}
 	},
-	$	:function(parentNode,tagName,className){  
+	$	:function(parentNode,tagName,className){
 		var parent=parentNode||document,
 			tag;
-		if(arguments.length==2){  
+		if(arguments.length==2){
 			className=tagName;
 			tag="*";
 		}else{
@@ -101,7 +101,7 @@ var	ev = {
 				script.type="text/javascript";
 				script.onload=script.onreadystatechange=function() {
 					if(!script.readyState || script.readyState === "loaded" || script.readyState === "complete"){
-						script.onload = script.onreadystatechange = null;  
+						script.onload = script.onreadystatechange = null;
 						if ( head && script.parentNode ) {
 								head.removeChild( script );
 						}
@@ -114,7 +114,7 @@ var	ev = {
 				link = document.createElement("link");link.type = "text/css";link.rel = "stylesheet";
 				link.href=name;
 				head.appendChild(link);
-				break;					   
+				break;
 		 }
 	},
 	hasClass:function(obj,c){
@@ -127,11 +127,36 @@ var	ev = {
 			}
 		}
 	   return false;
+	},
+	isVisible :function(obj){
+		if (obj == document) return true;
+
+		if (!obj) return false;
+		if (!obj.parentNode) return false;
+		if (obj.style) {
+			if (obj.style.display == 'none') return false;
+			if (obj.style.visibility == 'hidden') return false;
+		}
+
+		//Try the computed style in a standard way
+		if (window.getComputedStyle) {
+			var style = window.getComputedStyle(obj, "");
+			if (style.display == 'none') return false;
+			if (style.visibility == 'hidden') return false;
+		}
+
+		//Or get the computed style using IE's silly proprietary way
+		var style = obj.currentStyle;
+		if (style) {
+			if (style['display'] == 'none') return false;
+			if (style['visibility'] == 'hidden') return false;
+		}
+
+		return ev.isVisible(obj.parentNode);
 	}
 };
 
-var $=function(id){return document.getElementById(id);}	//simplify document.getElementById
-	,
+var $=function(id){return document.getElementById(id);},	//simplify document.getElementById
 	each=function(arrs,handler){
 		if(arrs.length){
 			for(var i=0,len=arrs.length;i<len;i++){
@@ -140,14 +165,12 @@ var $=function(id){return document.getElementById(id);}	//simplify document.getE
 		}else{
 			arrs&&handler.call(arrs,0);
 		}
-	}
-	,
+	},
 	hide=function(elem){
 		each(elem,function(){
 			this.style.display="none";
 		});
-	}
-	,
+	},
 	show=function(elem){
 		each(elem,function(){
 			this.style.display="block";

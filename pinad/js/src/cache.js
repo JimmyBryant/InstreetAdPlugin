@@ -2,6 +2,7 @@ var document = window.document,
 	navigator = window.navigator,
 	location = window.location,
 	imgs=[];
+
 //cache对象，加载广告数据
 var cache={
 	adsArray   :[],
@@ -17,29 +18,29 @@ var cache={
     },
     onImgLoad	:function(img){
 		var image=new Image();
-		image.src=img.src,
+		image.src=img.src;
 		image.insId=img.insId;
 		if(image.complete){
-			cache.loadData(image);
+			cache.requestData(image);
 		}else{
 			image.onload=function(){
 				var obj=this;
 				obj.onload=null;
-				cache.loadData(image);  
+				cache.requestData(image);
 			};
 		}
     },
-	loadData	:function(img){
+	requestData	:function(img){
 		var index=img.insId,
 			clientImg=imgs[index];
 		if(img.width>=config.imiw&&img.height>=config.imih){
 			if(clientImg.clientWidth>=config.imiw&&clientImg.clientHeight>=config.imih){
 				instreet.recordImage(clientImg);
-				if(typeof config.adsLimit=="number"&&config.adsLimit<=0){
-					return;
-				}
-				cache.createJsonp(clientImg);
-				config.adsLimit&&config.adsLimit--;
+				// if(typeof config.adsLimit=="number"&&config.adsLimit<=0){
+				// 	return;
+				// }
+				// cache.createJsonp(clientImg);
+				// config.adsLimit&&config.adsLimit--;
 			}
 		}
 	},

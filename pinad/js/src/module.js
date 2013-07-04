@@ -112,7 +112,7 @@ InstreetAd.prototype={
 		box.onmouseover=function(e){
 			var event=ev.getEvent(e),
 				rela=ev.getRelatedTarget(event);
-			!_.stopMouseover&&_.showWidget();
+			!_.stopMouseover&&_.showSpots();
 			if(rela!==img){
 				!_.stopMouseover&&_.showAd();
 			}
@@ -121,7 +121,7 @@ InstreetAd.prototype={
 		box.onmouseout=function(e){
 			var event=ev.getEvent(e),
 				rela=ev.getRelatedTarget(event);
-			_.hideWidget();
+			_.hideSpots();
 			if(!instreet.container.contains(rela)&&rela!==img){
 				_.hideAd();
 			}
@@ -132,7 +132,7 @@ InstreetAd.prototype={
 		ev.bind(img,"mouseover",function(e){
 			var event=ev.getEvent(e),
 				rela=ev.getRelatedTarget(event);
-			!_.stopMouseover&&_.showWidget();
+			!_.stopMouseover&&_.showSpots();
 			if(!instreet.container.contains(rela)){
 				_.recordShow(10);
 				!_.stopMouseover&&_.showAd();
@@ -142,7 +142,7 @@ InstreetAd.prototype={
 		ev.bind(img,"mouseout",function(e){
 			var event=ev.getEvent(e),
 				rela=ev.getRelatedTarget(event);
-			_.hideWidget();
+			_.hideSpots();
 
 			if(!instreet.container.contains(rela)){
 				instreet.hideApps();
@@ -262,6 +262,7 @@ InstreetAd.prototype={
 
 			//增加第三方点击监控
 			if(app.adClickMonitorUrl){
+				ad.notAllowShow=true;
 				monitorUrl=app.adClickMonitorUrl+encodeURIComponent(app.adsLinkUrl||'');
 			}
 			redUrl=config.redurl+"?tty=0&mx=&muh="+data.imageUrlHash+"&pd="+data.widgetSid+"&ift=&at="+(app.adsType||'')+"&ad="+(app.adsId||'')+"&rurl="+encodeURIComponent(encodeURIComponent(monitorUrl||app.adsLinkUrl||''));
@@ -293,6 +294,8 @@ InstreetAd.prototype={
 			ad.innerHTML=str;
 			_.boxWrapper.appendChild(ad);
 			_.ad=ad;
+			if(app.adsType==3)
+				InstreetAd.getImageAd(app.adsPicUrl,_);
 		}
 	},
 	getCoor  :function(spot){
@@ -311,7 +314,7 @@ InstreetAd.prototype={
 		return {top:(y+pos.y),left:(x+pos.x)};
 
 	},
-	showWidget   :function(){
+	showSpots   :function(){
 		var _=this,
 			spots=_.spotHolder;
 			// icons=_.icons;
@@ -322,7 +325,7 @@ InstreetAd.prototype={
 			$('ins-spot-focus').style.zIndex=spot_index;
 		}
 	},
-	hideWidget   :function(){
+	hideSpots   :function(){
 		var _=this,
 			spots=_.spotHolder;
 			// icons=_.icons;
@@ -340,20 +343,24 @@ InstreetAd.prototype={
 			pos=ev.getXY(img),
 			imgW=img.offsetWidth,
 			imgH=img.offsetHeight;
-		if(ad&&ad.style.display!="block"){
-			show(ad);
-			var adW=ad.lastChild.offsetWidth,
-				adH=100;
-			ad.style.cssText="display:block;left:"+(pos.x+(imgW-adW)/2)+"px;top:"+(pos.y+imgH-adH)+"px;width:"+adW+"px;height:"+adH+"px";
-			if(!_.slider){  //如果不存在slider对象则初始化一个
-				_.adClosed=true;
-				_.slider=new slider(ad.lastChild);
+		if(ad){
+			if(ad.notAllowShow){
+				return;
 			}
-			if(_.adClosed){
-				_.slider.stop();
-				_.slider.slideDown();
+			if(ad.style.display!="block"){
+				show(ad);
+				var adW=ad.lastChild.offsetWidth,
+					adH=100;
+				ad.style.cssText="display:block;left:"+(pos.x+(imgW-adW)/2)+"px;top:"+(pos.y+imgH-adH)+"px;width:"+adW+"px;height:"+adH+"px";
+				if(!_.slider||_.slider.height<=0){  //如果不存在slider对象则初始化一个
+					_.adClosed=true;
+					_.slider=new slider(ad.lastChild);
+				}
+				if(_.adClosed){
+					_.slider.stop();
+					_.slider.slideDown();
+				}
 			}
-
 		}
 	},
 	hideAd       :function(){
@@ -468,112 +475,6 @@ InstreetAd.prototype={
 
 		}
 		appBox.style.cssText="left:"+(pos.x+size)+"px;top:"+(pos.y+size)+"px;display:block;";
-	},
-   //鼠标移动到图片的时候发送展现记录
-   recordShow: function(flag,spot){
-
-		var _=this,
-			data=_.data,
-			img=_.img,
-			ul=config.iurl,
-			pd=data.widgetSid,
-			muh=data.imageUrlHash,
-			iu=encodeURIComponent(encodeURIComponent(img.src)),
-			adsId="",
-			adsType="",
-			mx="",
-			app=null;
-		if(flag==9&&spot){
-			var metrix=spot.metrix;
-			for(var i=0,len=data.adsSpot.length;i<len;i++){
-				app=data.adsSpot[i];
-				if(app.metrix==metrix){
-					adsId+=adsId===""?app.adsId:","+app.adsId;
-					adsType+=adsType===""?app.adsType:","+app.adsType;
-					mx=app.metrix;
-				}
-			}
-		}else if(flag==10&&_.ad){
-			app=data.badsSpot[0];
-			adsId=app.adsId;
-			adsType=app.adsType;
-		}
-
-		var time=new Date().getTime();
-		ul+="?pd="+pd+"&muh="+muh+"&mx="+mx+"&iu="+iu+"&ad="+adsId+"&at="+adsType+"&flag="+flag+"&time="+time;
-		ev.importFile('js',ul);
-		//增加第三方广告展现统计
-		!spot&&data.badsSpot[0]&&data.badsSpot[0].adViewMonitorUrl&&ev.importFile('js',data.badsSpot[0].adViewMonitorUrl+"?time="+time);
-
-   },
-   //鼠标移动到广告或者微博、百科上发送行为记录
-      recordWatch:function(tar){
-		var _=this,data=_.data,
-			img=_.img,
-			iu=encodeURIComponent(encodeURIComponent(img.src)),
-			pd=data.widgetSid,
-			ul=config.murl,
-			mid=data.imageNumId||'',
-			muh=data.imageUrlHash,
-			adData,
-			ad='',
-			at='',
-			tg='',
-			ift=0,
-			tty=1,
-			mx='',
-			i=0,
-			len=0,
-			app=null,
-			metrix;
-        var cn=tar.className.replace("-holder","");
-
-        if(cn=="shop"){
-			metrix=instreet.shop.metrix;
-			len=data.adsSpot.length;
-			for(i=0;i<len;i++){
-				app=data.adsSpot[i];
-				if(app.metrix==metrix){
-					ad+=ad===""?app.adsId:","+app.adsId;
-					at+=at===""?app.adsType:","+app.adsType;
-				}
-			}
-			tty=0;
-			mx=metrix;
-		}else if(cn=="weibo"){
-			ift=2;
-			metrix=instreet.weibo.metrix;
-			len=data.weiboSpot.length;
-			for(i=0;i<len;i++){
-				app=data.weiboSpot[i];
-				mx=metrix;
-				// if(app.metrix==metrix){
-				// 	 tg=app.title||'';
-				// 	 break;
-				// }
-			}
-		}else if(cn=="wiki"){
-			ift=4;
-			metrix=instreet.wiki.metrix;
-			len=data.wikiSpot.length;
-			for(i=0;i<len;i++){
-				app=data.wikiSpot[i];
-				mx=metrix;
-				// if(app.metrix==metrix){
-				// 	 tg=app.title||'';
-				// 	 break;
-				// }
-			}
-		}else if(cn=="ad"){
-			ad=data.badsSpot[0].adsId;
-			at=data.badsSpot[0].adsType;
-			tty=0;
-		}else{
-			return;
-		}
-		var time=new Date().getTime();
-		ul+="?iu="+iu+"&pd="+pd+"&muh="+muh+"&ad="+ad+"&mid="+mid+"&at="+at+"&tty="+tty+"&ift="+ift+"&mx="+mx+"&time="+time;
-		ev.importFile('js',ul);
 	}
 
 };
@@ -590,4 +491,35 @@ InstreetAd.reLocate =function(){                   //重新定位广告
       adObj.locate&&adObj.locate();
 
     }
+};
+
+InstreetAd.getImageAd=function(url,obj){
+	var image=new Image(),
+		ad=obj.ad,
+		cont=ad.lastChild;
+	image.src=url;
+	var loaded=function(){
+		var img=this,
+			maxH=100,
+			h=img.height<=maxH?img.height:maxH,
+			w=Math.round(img.width*(h/img.height)),
+			adImg=cont.getElementsByTagName('img')[0],
+			styleStr='width:'+w+'px;height:'+h+'px;display:block;';
+		cont.style.cssText=styleStr;
+		if(adImg){
+			adImg.style.cssText=styleStr;
+		}
+		ad.notAllowShow=false;
+		if(instreet_config.footAuto){
+			obj.showAd();
+		}
+	};
+	if(image.complete){
+		loaded.call(image);
+		return;
+	}
+	image.onload=function(){
+		image.onload=null;
+		loaded.call(image);
+	};
 };
