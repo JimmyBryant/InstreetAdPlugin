@@ -1,5 +1,5 @@
 /*
-	instreet.sprint.js v0.17
+	instreet.sprint.js v0.1.7
 */
 (function(window,undefined){
 

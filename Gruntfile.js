@@ -50,14 +50,19 @@ module.exports = function(grunt) {
 
 		  },
 		  cssmin:{
+	  		options: {
+		    	banner: '/* minified css file */'
+		    },
 		  	minify:{
-		  		options: {
-			    	banner: '/* minified css file */'
-			    },
 			    files:{
 			    	'pinad/css/instreet.pinad.min.css':'pinad/css/instreet.pinad.css'
 			    }
-		  	}
+		  	},
+		    sprint:{
+			    files:{
+		    		'sprint/css/instreet.sprint.min.css':'sprint/css/instreet.sprint.css'
+		   		}
+		    }
 		  },
 		  concat:{
 		  	options: {
@@ -69,8 +74,8 @@ module.exports = function(grunt) {
 		      dest: 'pinad/js/dist/instreet.pinad.js'
 		    },
 		    sprint:{
-		      src: ['sprint/js/src/intro.js','sprint/js/src/config.js','sprint/js/src/util-ev.js','sprint/js/src/ready.js','sprint/js/src/css.js',
-		      		'sprint/js/src/anim.js','sprint/js/src/cache.js','sprint/js/src/util-instreet.js','sprint/js/src/sprint.js', 'sprint/js/src/outro.js'],
+		      src: ['sprint/js/src/intro.js','sprint/js/src/config.js','sprint/js/src/util-ev.js','sprint/js/src/ready.js','sprint/js/src/css.js','sprint/js/src/anim.js',
+		      		'sprint/js/src/cache.js','sprint/js/src/util-instreet.js','sprint/js/src/sprint.js','sprint/js/src/record.js','sprint/js/src/app.js','sprint/js/src/outro.js'],
 		      dest: 'sprint/js/dist/instreet.sprint.js'
 		    }
 		  }
@@ -82,6 +87,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.registerTask('pinad',['concat:pinad','jshint','uglify','cssmin']);
-	grunt.registerTask('sprint',['concat:sprint','jshint:sprint','uglify:sprint']);
+	grunt.registerTask('sprint',['concat:sprint','jshint:sprint','uglify:sprint','cssmin:sprint']);
 
 };

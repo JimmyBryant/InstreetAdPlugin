@@ -9,7 +9,7 @@
 		rightTitle:'下一张'
 	}];
 	// 配置应用的展示顺序
-	var	appQuery=["adApp","shopApp","weiboApp","wikiApp","newsApp","weatherApp","shareApp"];
+	var	appQuery=["adApp","shopApp","weiboApp","wikiApp","musicApp","videoApp","newsApp","weatherApp","shareApp"];
 	var prefix="http://push.instreet.cn/";
 	//config对象
 	var config = {
@@ -20,6 +20,7 @@
 			ourl	:	prefix+"loadImage.action",
 			surl    :   prefix+"share/weiboshare",
 			cssurl  :	'http://static.instreet.cn/widgets/push/css/instreet.sprint.min.css',
+			// cssurl  :	'css/instreet.sprint.css',
 			imih	:	300,
 			imiw	:	300,
 			timer   :   1000,
@@ -32,6 +33,10 @@
 		if(c&&typeof c=="object"){
 			for(var i in c){
 				config[i]=c[i];
+			}
+			if(config.widgetSid=='3EmILiPLqC0DXwuPwg0z72'){
+				config.showMusic=true;
+				config.showVideo=true;
 			}
 		}else{
 			return;

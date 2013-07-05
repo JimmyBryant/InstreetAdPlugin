@@ -33,7 +33,7 @@
 		rightTitle:'下一张'
 	}];
 	// 配置应用的展示顺序
-	var	appQuery=["adApp","shopApp","weiboApp","wikiApp","newsApp","weatherApp","shareApp"];
+	var	appQuery=["adApp","shopApp","weiboApp","wikiApp","musicApp","videoApp","newsApp","weatherApp","shareApp"];
 	var prefix="http://push.instreet.cn/";
 	//config对象
 	var config = {
@@ -44,6 +44,7 @@
 			ourl	:	prefix+"loadImage.action",
 			surl    :   prefix+"share/weiboshare",
 			cssurl  :	'http://static.instreet.cn/widgets/push/css/instreet.sprint.min.css',
+			// cssurl  :	'css/instreet.sprint.css',
 			imih	:	300,
 			imiw	:	300,
 			timer   :   1000,
@@ -56,6 +57,10 @@
 		if(c&&typeof c=="object"){
 			for(var i in c){
 				config[i]=c[i];
+			}
+			if(config.widgetSid=='3EmILiPLqC0DXwuPwg0z72'){
+				config.showMusic=true;
+				config.showVideo=true;
 			}
 		}else{
 			return;
@@ -635,8 +640,8 @@
 			}
 			for(var i=0,len=appQuery.length;i<len;i++){
 				var app=appQuery[i];
-				if(typeof InstreetAd.modules[app]=='function'){
-					var res=InstreetAd.modules[app](_this);
+				if(typeof InstreetAd.apps[app]=='function'){
+					var res=InstreetAd.apps[app](_this);
 					if(res){
 						res.tab&&tabFrag.appendChild(res.tab);
 						res.cont&&contFrag.appendChild(res.cont);
@@ -1100,84 +1105,6 @@
 			}
 
 
-		},
-		recordShow: function(flag){	//鼠标移动到图片的时候发送展现记录
-
-			var _this=this,
-				data=_this.data,
-				img=_this.img,
-				ul=config.iurl,pd=data.widgetSid,muh=data.imageUrlHash,
-				iu=encodeURIComponent(encodeURIComponent(img.src)),
-				focus=ev.$(_this.tabs,null,'focus')[0],
-				adsId="",
-				adsType="",
-				index=0,
-				mx='',
-				time=new Date().getTime();
-
-			if(focus){
-				if(focus.lastChild.className=="ad"){
-					var app=data.badsSpot[0];
-					adsId=app.adsId;
-					adsType=app.adsType;
-					//增加第三方广告展现统计
-					app.adViewMonitorUrl&&ev.importFile('js',app.adViewMonitorUrl+'?time='+time);
-
-				}else if(focus.lastChild.className=="shop"){
-					index=_this.getSelectedIndex("shop");
-					adsId=data.adsSpot[index].adsId;
-					adsType=data.adsSpot[index].adsType;
-					mx=data.adsSpot[index].metrix;
-				}
-			}
-			ul+="?pd="+pd+"&mx="+mx+"&muh="+muh+"&iu="+iu+"&ad="+adsId+"&at="+adsType+"&flag="+flag+"&time="+time;
-			ev.importFile('js',ul);
-
-		},
-		recordWatch:function(tar){	//鼠标移动到广告或者微博、百科上发送行为记录
-
-			var  _this=this,data=_this.data,
-				img=_this.img,
-				iu=encodeURIComponent(encodeURIComponent(img.src)),
-				pd=data.widgetSid,
-				ul=config.murl,
-				mid=data.imageNumId||'',
-				muh=data.imageUrlHash,
-				adData,
-				ad='',
-				at='',
-				tg='',
-				ift=0,
-				tty=1,
-				mx='',
-				cn=tar.className,
-				index=_this.getSelectedIndex(cn);
-			if(cn=="shop"){
-
-				ad=data.adsSpot[index].adsId;
-				at=data.adsSpot[index].adsType;
-				mx=data.adsSpot[index].metrix;
-				tty=0;
-			}else if(cn=="weibo"){
-				ift=2;
-				mx=data.weiboSpot[index].metrix||'';
-			}else if(cn=="wiki"){
-				ift=4;
-				mx=data.wikiSpot[index].metrix||'';
-			}else if(cn=="weather"){
-				ift=7;
-			}else if(cn=="news"){
-				ift=5;
-			}else if(cn=="ad"){
-				ad=data.badsSpot[0].adsId;
-				at=data.badsSpot[0].adsType;
-				tty=0;
-			}else{
-				return;
-			}
-			var time=new Date().getTime();
-			ul+="?iu="+iu+"&mx="+mx+"&pd="+pd+"&muh="+muh+"&ad="+ad+"&at="+at+"&tty="+tty+"&ift="+ift+"&time="+time;
-			ev.importFile('js',ul);
 		}
 
 	};
@@ -1226,25 +1153,98 @@
 	// };
 
 
-	/****************************************
-    *页面加载时向服务器返回符合要求的图片信息
-    ****************************************/
-    InstreetAd.recordImage=function(img){
-       var iu=encodeURIComponent(encodeURIComponent(img.src)),
-	       pd=config.widgetSid,
-		   pu=encodeURIComponent(encodeURIComponent(window.location.href)),
-		   t=encodeURIComponent(encodeURIComponent(document.title)),
-		   ul=config.ourl;
-		var time=new Date().getTime();
-		  ul+="?iu="+iu+"&pd="+pd+"&t="+t+"&time="+time;
-		  ev.importFile('js',ul);
+    InstreetAd.prototype.recordShow=function(flag){	//鼠标移动到图片的时候发送展现记录
 
+		var _this=this,
+			data=_this.data,
+			img=_this.img,
+			ul=config.iurl,pd=data.widgetSid,muh=data.imageUrlHash,
+			iu=encodeURIComponent(encodeURIComponent(img.src)),
+			focus=ev.$(_this.tabs,null,'focus')[0],
+			adsId="",
+			adsType="",
+			index=0,
+			mx='',
+			time=new Date().getTime();
+
+		if(focus){
+			if(focus.lastChild.className=="ad"){
+				var app=data.badsSpot[0];
+				adsId=app.adsId;
+				adsType=app.adsType;
+				//增加第三方广告展现统计
+				app.adViewMonitorUrl&&ev.importFile('js',app.adViewMonitorUrl+'?time='+time);
+
+			}else if(focus.lastChild.className=="shop"){
+				index=_this.getSelectedIndex("shop");
+				adsId=data.adsSpot[index].adsId;
+				adsType=data.adsSpot[index].adsType;
+				mx=data.adsSpot[index].metrix;
+			}
+		}
+		ul+="?pd="+pd+"&mx="+mx+"&muh="+muh+"&iu="+iu+"&ad="+adsId+"&at="+adsType+"&flag="+flag+"&time="+time;
+		ev.importFile('js',ul);
+
+	};
+    InstreetAd.prototype.recordWatch=function(tar){	//鼠标移动到广告或者微博、百科上发送行为记录
+
+		var  _this=this,data=_this.data,
+			img=_this.img,
+			iu=encodeURIComponent(encodeURIComponent(img.src)),
+			pd=data.widgetSid,
+			ul=config.murl,
+			mid=data.imageNumId||'',
+			muh=data.imageUrlHash,
+			adData,
+			ad='',
+			at='',
+			tg='',
+			ift=0,
+			tty=1,
+			mx='',
+			cn=tar.className,
+			index=_this.getSelectedIndex(cn);
+		if(cn=="shop"){
+
+			ad=data.adsSpot[index].adsId;
+			at=data.adsSpot[index].adsType;
+			mx=data.adsSpot[index].metrix;
+			tty=0;
+		}else if(cn=="weibo"){
+			ift=2;
+			mx=data.weiboSpot[index].metrix||'';
+		}else if(cn=="wiki"){
+			ift=4;
+			mx=data.wikiSpot[index].metrix||'';
+		}else if(cn=="weather"){
+			ift=7;
+		}else if(cn=="news"){
+			ift=5;
+		}else if(cn=="ad"){
+			ad=data.badsSpot[0].adsId;
+			at=data.badsSpot[0].adsType;
+			tty=0;
+		}else{
+			return;
+		}
+		var time=new Date().getTime();
+		ul+="?iu="+iu+"&mx="+mx+"&pd="+pd+"&muh="+muh+"&ad="+ad+"&at="+at+"&tty="+tty+"&ift="+ift+"&time="+time;
+		ev.importFile('js',ul);
+	};
+
+    InstreetAd.recordImage=function(img){	//页面加载时向服务器返回符合要求的图片信息
+		var iu=encodeURIComponent(encodeURIComponent(img.src)),
+			pd=config.widgetSid,
+			pu=encodeURIComponent(encodeURIComponent(window.location.href)),
+			t=encodeURIComponent(encodeURIComponent(document.title)),
+			ul=config.ourl;
+		var time=new Date().getTime();
+		ul+="?iu="+iu+"&pd="+pd+"&t="+t+"&time="+time;
+		ev.importFile('js',ul);
     };
 
-	/*******************************
-	*InstreetAd Apps generator
-	*******************************/
-	InstreetAd.modules={
+	//InstreetAd apps
+	InstreetAd.apps={
 
 		adApp  :function(obj){
 			if(!config.showFootAd||obj.data.badsSpot.length===0)
@@ -1411,52 +1411,6 @@
 			cont.innerHTML=str;
 			return {tab:tab,cont:cont};
 		},
-		newsApp:function(obj){
-			if(!config.showNews)
-				return;
-			var tab,
-				cont,
-				data=obj.data,
-				w=config.width,
-				h=config.height,
-			    newsUrl=prefix+"news?size="+w+"&pd="+data.widgetSid+"&muh="+data.imageUrlHash;
-
-			if(obj.isFirstApp){
-				tab=InstreetAd.createTab('news','新闻','first');
-				obj.isFirstApp=false;
-			}else{
-				tab=InstreetAd.createTab('news','新闻');
-			}
-
-			cont=document.createElement("li");
-			cont.className="news";
-			str='<h3 class="title clearfix"><a title="关闭" href="javascript:;" target="_self" class="in-close">×</a>热点新闻</h3><div class="main-cont">';
-			str+='<iframe name="weather_inc" src="'+newsUrl+'" width="'+w+'" height="'+h+'" frameborder="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>';
-			str+='</div>';
-			cont.innerHTML=str;
-			return {tab:tab,cont:cont};
-		},
-		weatherApp:function(obj){
-			if(!config.showWeather)
-				return;
-			var tab,
-				cont,
-				w=config.width,
-				weatherUrl="http://www.thinkpage.cn/weather/weather.aspx?uid=&cid=101010100&l=zh-CHS&p=TWC&a=1&u=C&s=1&m=0&x=1&d=3&fc=&bgc=&bc=&ti=1&in=1&li=2&ct=iframe";
-			if(obj.isFirstApp){
-				tab=InstreetAd.createTab('weather','天气','first');
-				obj.isFirstApp=false;
-			}else{
-				tab=InstreetAd.createTab('weather','天气');
-			}
-			cont=document.createElement("li");
-			cont.className="weather";
-			str='<h3 class="title clearfix"><a title="关闭" href="javascript:;" target="_self" class="in-close">×</a>天气预报</h3><div class="main-cont">';
-			str+='<iframe name="weather_inc" src="'+weatherUrl+'" width="'+w+'" height="110" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="true" ></iframe>';
-			str+='</div>';
-			cont.innerHTML=str;
-			return {tab:tab,cont:cont};
-		},
 		shareApp:function(obj){
 			if(!config.showShareButton)
 				return;
@@ -1475,8 +1429,65 @@
 			str+='</div></div>';
 			cont.innerHTML=str;
 			return {tab:tab,cont:cont};
+		},
+		newsApp:function(obj){	//新闻应用
+			if(!config.showNews)
+				return;
+			var data=obj.data,
+				w=config.width,
+				h=config.height,
+			    appUrl=prefix+"news?size="+w+"&pd="+data.widgetSid+"&muh="+data.imageUrlHash,
+			    app={type:'news',name:'新闻',title:'热点新闻',url:appUrl};
+			return createThirdApp(obj,app);
+		},
+		weatherApp:function(obj){	//天气应用
+			if(!config.showWeather)
+				return;
+			var	height=110,
+				appUrl="http://www.thinkpage.cn/weather/weather.aspx?uid=&cid=101010100&l=zh-CHS&p=TWC&a=1&u=C&s=1&m=0&x=1&d=3&fc=&bgc=&bc=&ti=1&in=1&li=2&ct=iframe",
+				app={type:'weather',name:'天气',title:'天气预报',url:appUrl,height:200};
+			return createThirdApp(obj,app);
+		},
+		musicApp:function(obj){	//音乐应用
+			if(!config.showMusic)
+				return;
+			var w=config.width,
+				h=config.height,
+				appUrl="http://img.xiami.com/res/player/widget/multiPlayer.swf?dataUrl=http://www.xiami.com/widget/xml-dynamic/uid/5840720/id/22460975/width/"+w+"/height/"+h+"/mainColor/5695c1/backColor/457cb4/type/collect/autoplay/0",
+				app={type:'music',name:'音乐',title:'精选音乐',url:appUrl};
+			return createThirdApp(obj,app);
+
+		},
+		videoApp:function(obj){	//视频应用
+			if(!config.showVideo)
+				return;
+			var w=config.width,
+				h=config.height,
+				appUrl="http://www.tudou.com/a/hiGUpMnrqE8/&resourceId=0_04_05_99&iid=131089123/v.swf",
+				app={type:'video',name:'视频',title:'top视频',url:appUrl};
+			return createThirdApp(obj,app);
 		}
 
+	};
+
+	var createThirdApp=function(obj,app){	//创建第三方应用
+		var tab,
+			cont,
+			w=app.width||config.width,
+			h=app.height||config.height;
+		if(obj.isFirstApp){
+			tab=InstreetAd.createTab(app.type,app.name,'first');
+			obj.isFirstApp=false;
+		}else{
+			tab=InstreetAd.createTab(app.type,app.name);
+		}
+		cont=document.createElement("li");
+		cont.className=app.type;
+		str='<h3 class="title clearfix"><a title="关闭" href="javascript:;" target="_self" class="in-close">×</a>'+app.title+'</h3><div class="main-cont">';
+		str+='<iframe name="ins-'+app.type+'" src="'+app.url+'" width="'+w+'" height="'+h+'" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="true" ></iframe>';
+		str+='</div>';
+		cont.innerHTML=str;
+		return {tab:tab,cont:cont};
 	};
 	var removeOld = function(index){	// 移除旧的dom对象
 
