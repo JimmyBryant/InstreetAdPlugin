@@ -9,7 +9,7 @@
 		rightTitle:'下一张'
 	}];
 	// 配置应用的展示顺序
-	var	appQuery=["adApp","shopApp","weiboApp","wikiApp","musicApp","videoApp","newsApp","weatherApp","shareApp"];
+	var	appQuery=["adApp","shopApp","weiboApp","wikiApp","newsApp","weatherApp","musicApp","videoApp","shareApp"];
 	var prefix="http://push.instreet.cn/";
 	//config对象
 	var config = {
