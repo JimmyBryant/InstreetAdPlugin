@@ -21,4 +21,18 @@
 	   host = location.hostname,
 	   isIE=!!window.ActiveXObject,
 	   imgs=[],
-	   isFirst=true;
+	   isFirst=true,
+	   container=null,
+	   spotBox=null;
+
+	var createContainer = function(){						//创建广告容器
+		var container=document.createElement('div'),
+			spotBox=document.createElement('div');
+		container.id="instreet-plugin-container";
+		spotBox.id="instreet-plugin-spotbox";
+
+		container.appendChild(spotBox);
+		var body=document.getElementsByTagName[0]||document.documentElement;
+		body.firstChild&&body.insertBefore(container,body.firstChild);
+		return container;
+	};

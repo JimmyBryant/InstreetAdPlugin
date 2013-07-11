@@ -12,7 +12,7 @@
 		this.init();
 	};
 
-	InstreetAd.prototype={
+	extend({
 
 		constructor:InstreetAd,
 
@@ -77,8 +77,10 @@
 
 		},
 		createSpot :function(app,index){
-			var oWidth=app.width,metrix=app.metrix,
-			    spot=document.createElement("a"),spotContainer=$("instreet-plugin-spotbox");
+			var oWidth=app.width,
+				metrix=app.metrix,
+			    spot=document.createElement("a"),
+			    spotContainer=spotBox;
 		    spot.href="javascript:;";
 		    spot.index=index;
 		    spot.target="_self";
@@ -524,8 +526,7 @@
 
 
 		}
-
-	};
+	},InstreetAd.prototype);
 
 
 	/*****************************

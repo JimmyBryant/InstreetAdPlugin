@@ -21,8 +21,6 @@
 			iurl    :	prefix+"tracker90.action",
 			ourl	:	prefix+"loadImage.action",
 			surl    :   prefix+"share/weiboshare",
-			// cssurl  :	'http://static.instreet.cn/widgets/push/css/instreet.msncouplet.min.css',
-			cssurl  :	'css/instreet.msncouplet.css',
 			imih	:	300,
 			imiw	:	300,
 			timer   :   1000,

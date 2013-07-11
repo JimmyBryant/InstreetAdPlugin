@@ -158,6 +158,9 @@
 	var $=function(id){return document.getElementById(id);}	//simplify document.getElementById
 		,
 		each=function(arrs,handler){
+			if(!arrs){
+				return;
+			}
 			if(arrs.length){
 				for(var i=0,len=arrs.length;i<len;i++){
 					handler.call(arrs[i],i);
@@ -178,3 +181,15 @@
 				this.style.display="block";
 			});
 		};
+
+	var extend=function(c,obj){	//extend object
+		if(c){
+			if(typeof c=="object"){
+				for(var i in c){
+					obj[i]=c[i];
+				}
+			}else if(typeof c=='function'){
+				obj[c]=c;
+			}
+		}
+	};

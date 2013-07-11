@@ -42,7 +42,7 @@
 			var index=data.index,img=imgs[index];
 			img.insDataLoaded=true;
 			img.setAttribute('instreet_data_loaded',true);
-			var ad=new InstreetAd(data,instreet.container);
+			var ad=new InstreetAd(data,container);
 			removeOld(index); //删除旧的dom对象
 			cache.adsArray[index]=ad;
 			// InstreetAd.autoShow(ad);
@@ -53,15 +53,15 @@
 	function init(){	//初始化插件
 
 		 if(typeof instreet_config!="undefined"){		//mix配置信息
-			 extendConfig(instreet_config);
+			 extend(instreet_config,config);
 		 }
-	     instreet.init();
-		 cache.requestAd();
-		 ev.bind(window,'load',function(){InstreetAd.reLocate();refilter();});
-		 ev.bind(window,'resize',function(){InstreetAd.reLocate();});
-		 //定时检测图片是否变化
-         TimerTick(cache.adsArray);
-
+		 if((container=createContainer())){
+			config.cssurl&&ev.importFile('css',config.cssurl);
+			cache.requestAd();
+			ev.bind(window,'load',function(){InstreetAd.reLocate();refilter();});
+			ev.bind(window,'resize',function(){InstreetAd.reLocate();});
+			TimerTick(cache.adsArray);	//定时检测图片是否变化
+		 }
 	}
 
 	DOMReady(function(){	//dom ready后开始执行init

@@ -16,13 +16,16 @@
 
 		 if(typeof instreet_config!="undefined"){		//mix配置信息
 			extend(instreet_config,config);
+			config.width=120;
+			config.height=600;
 		 }
 		 if((container=createContainer())){
-			ev.importFile('css',config.cssurl);
+			config.cssurl&&ev.importFile('css',config.cssurl);
 			cache.requestAd();
+			ev.bind(window,'resize',function(){msnCouplet.relocate();});
+			timerTick(cache.adsArray);	//定时检测图片是否切换
 		 }
-		 ev.bind(window,'resize',function(){msnCouplet.relocate();});
-         timerTick(cache.adsArray);	//定时检测图片是否切换
+
 
 	}
 

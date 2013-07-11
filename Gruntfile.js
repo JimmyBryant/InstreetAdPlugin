@@ -19,12 +19,9 @@ module.exports = function(grunt) {
 		 },
 		 uglify: {
 			options: {
-				banner: '/*!<%= grunt.template.today("yyyy-mm-dd") %> */\n'
+				banner: '/*!<%= grunt.template.today("yyyy-mm-dd H:mm:ss") %> */\n'
 			},
 			pinad:{
-				options: {
-					banner: '/*!pinad.js <%= grunt.template.today("yyyy-mm-dd") %> */\n'
-				},
 				files: {
 				  'pinad/js/dist/instreet.pinad.min.js': ['pinad/js/dist/instreet.pinad.js'],
 				}
@@ -87,7 +84,7 @@ module.exports = function(grunt) {
 		    },
 		    sprint:{
 				src: ['sprint/js/src/intro.js','sprint/js/src/config.js','sprint/js/src/util-ev.js','sprint/js/src/ready.js','sprint/js/src/css.js','sprint/js/src/anim.js',
-						'sprint/js/src/cache.js','sprint/js/src/util-instreet.js','sprint/js/src/sprint.js','sprint/js/src/record.js','sprint/js/src/app.js','sprint/js/src/outro.js'],
+						'sprint/js/src/cache.js','sprint/js/src/sprint.js','sprint/js/src/record.js','sprint/js/src/app.js','sprint/js/src/outro.js'],
 				dest: 'sprint/js/dist/instreet.sprint.js'
 		    },
 		    msncouplet:{

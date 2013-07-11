@@ -27,18 +27,3 @@
 			width   :   250,
 			height	:   250
 	};
-
-	//extend config info
-	var extendConfig=function(c){
-		if(c&&typeof c=="object"){
-			for(var i in c){
-				config[i]=c[i];
-			}
-			if(config.widgetSid=='3EmILiPLqC0DXwuPwg0z72'){
-				config.showMusic=true;
-				config.showVideo=true;
-			}
-		}else{
-			return;
-	   }
-	};

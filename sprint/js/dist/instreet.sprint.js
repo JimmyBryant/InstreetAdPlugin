@@ -21,7 +21,21 @@
 	   host = location.hostname,
 	   isIE=!!window.ActiveXObject,
 	   imgs=[],
-	   isFirst=true;
+	   isFirst=true,
+	   container=null,
+	   spotBox=null;
+
+	var createContainer = function(){						//创建广告容器
+		var container=document.createElement('div'),
+			spotBox=document.createElement('div');
+		container.id="instreet-plugin-container";
+		spotBox.id="instreet-plugin-spotbox";
+
+		container.appendChild(spotBox);
+		var body=document.getElementsByTagName[0]||document.documentElement;
+		body.firstChild&&body.insertBefore(container,body.firstChild);
+		return container;
+	};
 
 	//配置不同网站图集页上一张、下一张按钮
 	var galleryConfig = [{
@@ -52,20 +66,6 @@
 			height	:   250
 	};
 
-	//extend config info
-	var extendConfig=function(c){
-		if(c&&typeof c=="object"){
-			for(var i in c){
-				config[i]=c[i];
-			}
-			if(config.widgetSid=='3EmILiPLqC0DXwuPwg0z72'){
-				config.showMusic=true;
-				config.showVideo=true;
-			}
-		}else{
-			return;
-	   }
-	};
 	//function util
 	var	ev = {
 		bind : function(element,type,handler){
@@ -226,6 +226,9 @@
 	var $=function(id){return document.getElementById(id);}	//simplify document.getElementById
 		,
 		each=function(arrs,handler){
+			if(!arrs){
+				return;
+			}
 			if(arrs.length){
 				for(var i=0,len=arrs.length;i<len;i++){
 					handler.call(arrs[i],i);
@@ -246,6 +249,18 @@
 				this.style.display="block";
 			});
 		};
+
+	var extend=function(c,obj){	//extend object
+		if(c){
+			if(typeof c=="object"){
+				for(var i in c){
+					obj[i]=c[i];
+				}
+			}else if(typeof c=='function'){
+				obj[c]=c;
+			}
+		}
+	};
 	var readylist=[],
 		ready=false,
 		loadedReg=/^(loaded|complete)$/;
@@ -559,27 +574,6 @@
 		}
 
 	};
-	var instreet={	//instreet对象
-
-		init :function(){
-
-			var cssurl=config.cssurl;
-			ev.importFile('css',cssurl);
-			instreet.createContainer();
-
-		},
-		createContainer: function(){						//创建广告容器
-	       var container=document.createElement('div'),
-		       spotBox=document.createElement('div');
-		   container.id="instreet-plugin-container";
-		   spotBox.id="instreet-plugin-spotbox";
-		   instreet.container=container;
-		   instreet.spotBox=spotBox;
-		   container.appendChild(spotBox);
-		   document.body.children&&document.body.insertBefore(container,document.body.firstChild);
-		}
-
-	};
 	/***********************************
 	*InstreetAd类
 	************************************/
@@ -594,7 +588,7 @@
 		this.init();
 	};
 
-	InstreetAd.prototype={
+	extend({
 
 		constructor:InstreetAd,
 
@@ -659,8 +653,10 @@
 
 		},
 		createSpot :function(app,index){
-			var oWidth=app.width,metrix=app.metrix,
-			    spot=document.createElement("a"),spotContainer=$("instreet-plugin-spotbox");
+			var oWidth=app.width,
+				metrix=app.metrix,
+			    spot=document.createElement("a"),
+			    spotContainer=spotBox;
 		    spot.href="javascript:;";
 		    spot.index=index;
 		    spot.target="_self";
@@ -1106,8 +1102,7 @@
 
 
 		}
-
-	};
+	},InstreetAd.prototype);
 
 
 	/*****************************
@@ -1533,7 +1528,7 @@
 			var index=data.index,img=imgs[index];
 			img.insDataLoaded=true;
 			img.setAttribute('instreet_data_loaded',true);
-			var ad=new InstreetAd(data,instreet.container);
+			var ad=new InstreetAd(data,container);
 			removeOld(index); //删除旧的dom对象
 			cache.adsArray[index]=ad;
 			// InstreetAd.autoShow(ad);
@@ -1544,15 +1539,15 @@
 	function init(){	//初始化插件
 
 		 if(typeof instreet_config!="undefined"){		//mix配置信息
-			 extendConfig(instreet_config);
+			 extend(instreet_config,config);
 		 }
-	     instreet.init();
-		 cache.requestAd();
-		 ev.bind(window,'load',function(){InstreetAd.reLocate();refilter();});
-		 ev.bind(window,'resize',function(){InstreetAd.reLocate();});
-		 //定时检测图片是否变化
-         TimerTick(cache.adsArray);
-
+		 if((container=createContainer())){
+			config.cssurl&&ev.importFile('css',config.cssurl);
+			cache.requestAd();
+			ev.bind(window,'load',function(){InstreetAd.reLocate();refilter();});
+			ev.bind(window,'resize',function(){InstreetAd.reLocate();});
+			TimerTick(cache.adsArray);	//定时检测图片是否变化
+		 }
 	}
 
 	DOMReady(function(){	//dom ready后开始执行init
