@@ -40,7 +40,7 @@
 				w=this.param.width,
 				h=this.param.height;
 
-			data={left:{src:'http://static.instreet.cn/bdpic/msn_couplet_demo.swf',type:'flash',directUrl:'http://www.instreet.cn'},right:{src:'http://static.instreet.cn/bdpic/msn_couplet_demo.swf',type:'flash',directUrl:'http://www.instreet.cn'}};
+			data={left:{src:'http://s2.instreet.cn/corner/images/imgad01.gif',type:'image',directUrl:'http://www.instreet.cn'},right:{src:'http://s2.instreet.cn/corner/images/imgad02.gif',type:'image',directUrl:'http://www.instreet.cn'}};
 
 			var getContent=function(ad){
 				var cont=document.createElement("div");
@@ -51,8 +51,8 @@
 										'<a href="'+ad.directUrl+'" target="_blank" style="position:absolute;top:0;left:0;width:'+w+'px;height:'+h+'px;z-index:10;background-color:#FFF;opacity:0;filter:alpha(opacity=0)"></a>';
 						break;
 					case "image":
-					cont.innerHTML='<a href="'+ad.directUrl+'"><img width="'+w+'" height="'+h+'" src="'+data.src+'"/></a>';
-					break;
+						cont.innerHTML='<a target="_blank" title="" href="'+ad.directUrl+'"><img width="'+w+'" height="'+h+'" src="'+ad.src+'"/></a>';
+						break;
 				}
 				return cont;
 			};

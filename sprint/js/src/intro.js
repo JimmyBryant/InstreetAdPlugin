@@ -9,8 +9,8 @@
 
 		window.InstreetWidget = {
 			version : "@REVISION@",
-	        name    : "InstreetImageWidget",
-	        style	: "sprint"
+	        type    : "InstreetImageWidget",
+	        name	: "sprint"
 		};
 
 	}
@@ -26,13 +26,17 @@
 	   spotBox=null;
 
 	var createContainer = function(){						//创建广告容器
-		var container=document.createElement('div'),
-			spotBox=document.createElement('div');
-		container.id="instreet-plugin-container";
-		spotBox.id="instreet-plugin-spotbox";
+		var c=document.createElement('div'),
+			s=document.createElement('div');
+		c.id="instreet-plugin-container";
+		s.id="instreet-plugin-spotbox";
 
-		container.appendChild(spotBox);
-		var body=document.getElementsByTagName[0]||document.documentElement;
-		body.firstChild&&body.insertBefore(container,body.firstChild);
-		return container;
+		c.appendChild(s);
+		spotBox=s;
+		var body=document.getElementsByTagName('body')[0]||document.documentElement;
+		if(body&&body.firstChild){
+			body.insertBefore(c,body.firstChild);
+			return c;
+		}
+		return null;
 	};

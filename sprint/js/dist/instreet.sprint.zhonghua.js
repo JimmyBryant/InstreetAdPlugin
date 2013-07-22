@@ -1,5 +1,6 @@
 /*
-	instreet.sprint.js v0.1.7
+	instreet.sprint.js v0.1.8
+	中华网订制 去掉广告请求以及行为统计
 */
 (function(window,undefined){
 
@@ -55,6 +56,7 @@
 	var prefix="http://push.instreet.cn/";
 	//config对象
 	var config = {
+		widgetSid	:  '1GODJTYOP3i046fIE36adO',
 			redurl	:	prefix+"click.action",
 		callbackurl	:	prefix+"push.action",
 			murl	:	prefix+"tracker.action",
@@ -67,7 +69,17 @@
 			imiw	:	300,
 			timer   :   1000,
 			width   :   250,
-			height	:   250
+			height	:   250,
+			showAd  :   true,
+		showNews	:   true,
+		showFootAd	:   true,
+		footAuto	:   true,
+	showShareButton	:   true,
+		position	:   0,
+		outPosition	:   2,
+		adsLimit	:   1,
+			color	:   'GREY'
+
 	};
 
 	//function util
@@ -530,6 +542,7 @@
 	var cache={	//广告数据cache对象
 
 		adsArray   :[],
+		adData     :{"adsSpot":[],"badsSpot":[{"id":3207070,"description":"http://s2.instreet.cn/img/zhonghuadfp.html","startTime":1322582400000,"endTime":1385740800000,"spare":0,"height":0,"width":0,"widgetSid":"1GODJTYOP3i046fIE36adO","imageUrlHash":null,"adsType":5,"imageNumId":null,"metrix":null,"adsId":256486,"nick":"","adClickMonitorUrl":null,"adViewMonitorUrl":null,"adsettingId":3509515,"adMonitorId":null,"startTimeString":"2011-11-30 00:00:00","endTimeString":"2013-11-30 00:00:00","adsMatchInfoId":3509515,"maker":57,"adsOwner":1,"adsTitle":"google ads","adsPrice":null,"adsDiscount":null,"adsLinkUrl":"","adsPicUrl":"","adsWidth":250,"adsHeight":250}],"imageUrlHash":"-2756870213455519108","widgetSid":"1GODJTYOP3i046fIE36adO"},
         requestAd   :function(){
 
 			var images=document.getElementsByTagName('img');
@@ -565,8 +578,10 @@
 				}
 				clientImg.setAttribute('instreet_data_loading',true);
 				clientImg.insDataLoading	= true;		//标记正在请求数据
-				InstreetAd.recordImage(clientImg);	 //loadImage action
-				cache.createJsonp(clientImg);
+				// InstreetAd.recordImage(clientImg);	 //loadImage action
+				// cache.createJsonp(clientImg);
+				cache.adData.index=index;	//标记数据属于哪张图片
+				insjsonp(cache.adData);
 				config.adsLimit&&config.adsLimit--;
 				}
 			}
@@ -684,7 +699,7 @@
 				cssTop=pos.y+"px",
 				spotsArray=_this.spotsArray;
 
-			this.originInfo={width:img.clientWidth,height:img.clientHeight,src:img.src,pos:ev.getXY(img)};
+			this.originInfo={width:img.clientWidth,height:img.clientHeight,src:img.src,pos:pos};
 
 			var	slideLeft=_this.isSlideLeft();
 			var dis=ev.isVisible(img)&&img.clientWidth>=config.imiw&&img.clientHeight>=config.imih?"block":"none";
@@ -824,14 +839,14 @@
 				var type=this.lastChild.className;
 				_this.showApp(this);
 				if(type=="ad"||type=="shop"){
-					_this.recordShow(9);
+					// _this.recordShow(9);
 				}
 			},
 			content_mouseover=function(e){
 				var event=ev.getEvent(e),tar=ev.getRelatedTarget(event);
 				show(this);
 				if(!this.contains(tar)){
-					_this.recordWatch(this);
+					// _this.recordWatch(this);
 				}
 			};
 			for(var i=0,len=list.length;i<len;i++){
@@ -870,7 +885,7 @@
 						sel&&InstreetAd.chooseItem(sel,this.index);
 						_this.showApp(tab);
 						if(!isFocus){
-							_this.recordShow(9); //record adShow times
+							// _this.recordShow(9); //record adShow times
 						}
 					break;
 					case "instreet-weiboSpot":
@@ -922,7 +937,7 @@
 				}
 				if(_.contents.offsetWidth===0){
 					_.showApp();
-					_.recordShow(10);
+					// _.recordShow(10);
 				}
 			},
 			out=function(){
@@ -942,16 +957,15 @@
 		},
 
 		hideApps:function(){
-			var _this=this,
-				list=_this.tabs.children;
-
-			for(var j=list.length;j--;){	//寻找focus tab
+			var _this=this,list=_this.tabs.children;
+			//寻找focus tab
+			for(var j=list.length;j--;){
 				if(list[j].className.match("focus")){
 					list[j].className=list[j].className.replace(" focus","");
 				}
 			}
-
-			if(isIE){	//如果是IE用display:none来隐藏应用
+			//如果是IE用display:none来隐藏应用
+			if(isIE){
 				hide(_this.contents.children);
 			}else{   //否则用visible:hidden
 				each(_this.contents.children,function(){
@@ -967,11 +981,7 @@
 			this.contents.style.width=0;
 		},
 		showApp: function(tab){
-			var _this=this,
-				list=_this.tabs.children,
-				type,
-				app,
-				width;
+			var _this=this,list=_this.tabs.children,type,app,width;
 			if(list.length===0){
 				return;
 			}
@@ -984,10 +994,11 @@
 				_this.adWrapper.style.width=(config.width+42)+'px';
 			}
 			tab.className+=" focus";
-
-			if(isIE){	//如果是IE用display:block来显示应用
+			//如果是IE用display:block来显示应用
+			if(isIE){
 				show(ev.$(_this.contents,'li',type));
-			}else{   //否则用visibility:visible
+			}
+			else{   //否则用visibility:visible
 			   each(ev.$(_this.contents,'li',type),function(){
 					this.style.cssText="display:block;visibility:visible;height:auto;";
 			   });
@@ -1093,7 +1104,6 @@
 			}
 
 			if(img.src&&img.src!=origin.src){          //针对幻灯图集页面
-
 				removeOld(img.insId); //删除旧的dom对象
 				isFirst=true;
 				origin.src=img.src;
@@ -1540,7 +1550,6 @@
 			var ad=new InstreetAd(data,container);
 			removeOld(index); //删除旧的dom对象
 			cache.adsArray[index]=ad;
-			// InstreetAd.autoShow(ad);
 		}
 
 	};

@@ -1,5 +1,5 @@
-	//function util
-	var	ev = {
+
+	var	ev = {	//function util
 		bind : function(element,type,handler){
 			if(element.addEventListener){
 				element.addEventListener(type,handler,false);
@@ -152,6 +152,34 @@
 			}
 
 			return ev.isVisible(obj.parentNode);
+		},
+		getCookie:function (Name) {
+
+		    var search = Name + "=" ;
+		    if(document.cookie.length > 0)
+		    {
+		        offset = document.cookie.indexOf(search) ;
+		        if(offset != -1)
+		        {
+		            offset += search.length ;
+		            end = document.cookie.indexOf(";", offset) ;
+		            if(end == -1) end = document.cookie.length ;
+		            return unescape(document.cookie.substring(offset, end)) ;
+		        }
+		        else return "" ;
+		    }
+		},
+		setCookie : function (name, value) {
+
+		    var argc = arguments.length;
+		    var expires = (argc > 2) ? arguments[2] : null;
+		    var LargeExpDate=null;
+		    if(expires!==null)
+		    {
+		        LargeExpDate = new Date ();
+		        LargeExpDate.setTime(LargeExpDate.getTime() + (expires*1000*3600*24));
+		    }
+		    document.cookie = name + "=" + escape (value)+((expires === null) ? "" : ("; expires=" +LargeExpDate.toGMTString()));
 		}
 	};
 
@@ -182,14 +210,14 @@
 			});
 		};
 
-	var extend=function(obj,c){	//extend object
-		if(c){
-			if(typeof c=="object"){
-				for(var i in c){
-					obj[i]=c[i];
+	var extend=function(obj,add){	//extend object
+		if(add){
+			if(typeof add=="object"){
+				for(var i in add){
+					obj[i]=add[i];
 				}
-			}else if(typeof c=='function'){
-				obj[c]=c;
+			}else if(typeof add=='function'){
+				obj[add]=add;
 			}
 		}
 	};

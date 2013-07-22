@@ -1,7 +1,6 @@
 module.exports = function(grunt) {
 	grunt.initConfig({
 		 pkg: grunt.file.readJSON('package.json'),
-		 msn_pkg:grunt.file.readJSON('msncouplet/package.json'),
 		 jshint:{
 		 	options:{
 		 		immed:true,
@@ -15,6 +14,7 @@ module.exports = function(grunt) {
 		 	},
 		 	src:['pinad/js/dist/instreet.pinad.js'],
 		 	sprint:['sprint/js/dist/instreet.sprint.js'],
+		 	metro:['metro/js/dist/instreet.metro.js'],
 		 	msncouplet:['msncouplet/js/dist/instreet.msncouplet.js']
 		 },
 		 uglify: {
@@ -29,6 +29,7 @@ module.exports = function(grunt) {
 			sprint:{
 				files: {
 					'sprint/js/dist/instreet.sprint.min.js':['sprint/js/dist/instreet.sprint.js'],
+					'sprint/js/dist/instreet.sprint.zhonghua.min.js':['sprint/js/dist/instreet.sprint.zhonghua.js'],
 				}
 			},
 			msncouplet:{
@@ -43,7 +44,7 @@ module.exports = function(grunt) {
 			},
 			metro:{
 				files: {
-				  'metro/js/instreet.metro.min.js': ['metro/js/instreet.metro.js'],
+				  'metro/js/dist/instreet.metro.min.js': ['metro/js/instreet.metro.js'],
 				}
 			},
 			default:{
@@ -67,6 +68,11 @@ module.exports = function(grunt) {
 		    		'sprint/css/instreet.sprint.min.css':'sprint/css/instreet.sprint.css'
 		   		}
 		    },
+		    metro:{
+			    files:{
+		    		'metro/css/instreet.metro.min.css':'metro/css/instreet.metro.css'
+		   		}
+		    },
 		    msncouplet:{
 			    files:{
 		    		'msncouplet/css/instreet.msncouplet.min.css':'msncouplet/css/instreet.msncouplet.css'
@@ -76,6 +82,11 @@ module.exports = function(grunt) {
 		  concat:{
 		  	options: {
 
+		    },
+		    metro: {
+				src: ['metro/js/src/intro.js','metro/js/src/config.js','metro/js/src/util-ev.js','metro/js/src/ready.js','metro/js/src/css.js','metro/js/src/anim.js',
+					'metro/js/src/request.js','metro/js/src/metro.js','metro/js/src/app.js','metro/js/src/record.js', 'metro/js/src/outro.js'],
+				dest: 'metro/js/dist/instreet.metro.js'
 		    },
 		    pinad: {
 				src: ['pinad/js/src/intro.js','pinad/js/src/config.js','pinad/js/src/cache.js','pinad/js/src/util-ev.js','pinad/js/src/ready.js',
@@ -88,9 +99,6 @@ module.exports = function(grunt) {
 				dest: 'sprint/js/dist/instreet.sprint.js'
 		    },
 		    msncouplet:{
-				options:{
-					banner:'/*!<%=msn_pkg.name%> v<%=msn_pkg.version%>*/'
-				},
 				src: ['msncouplet/js/src/intro.js','msncouplet/js/src/config.js','msncouplet/js/src/util-ev.js','msncouplet/js/src/ready.js',
 						'msncouplet/js/src/cache.js','msncouplet/js/src/couplet.js','msncouplet/js/src/tick.js','msncouplet/js/src/outro.js'],
 				dest: 'msncouplet/js/dist/instreet.msncouplet.js'
@@ -105,6 +113,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.registerTask('pinad',['concat:pinad','jshint','uglify','cssmin']);
 	grunt.registerTask('sprint',['concat:sprint','jshint:sprint','uglify:sprint','cssmin:sprint']);
+	grunt.registerTask('metro',['concat:metro','jshint:metro','uglify:metro','cssmin:metro']);
 	grunt.registerTask('msncouplet',['concat:msncouplet','jshint:msncouplet','uglify:msncouplet','cssmin:msncouplet']);
 
 };

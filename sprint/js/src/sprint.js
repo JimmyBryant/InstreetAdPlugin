@@ -6,13 +6,12 @@
 		this.data=data;
 		this.container=container;
 		this.img=img;
-		this.originInfo={width:img.clientWidth,height:img.clientHeight,src:img.src,pos:ev.getXY(img)};
 		this.spotsArray=[];
 		this.timerId=null;
 		this.init();
 	};
 
-	extend({
+	extend(InstreetAd.prototype,{
 
 		constructor:InstreetAd,
 
@@ -96,14 +95,18 @@
 			spotContainer.appendChild(spot);
 		},
 		locate   :function(){                            //定位广告
-			var _this=this,img=_this.img,pos=ev.getXY(img)
-			,w=img.offsetWidth
-			,left=(pos.x+w)+"px"
-			,right=(Math.max(document.body.clientWidth,document.documentElement.clientWidth)-pos.x)+'px'
-			,top=pos.y+"px",spotsArray=_this.spotsArray;
+			var _this=this,
+				img=_this.img,
+				pos=ev.getXY(img),
+				w=img.offsetWidth,
+				cssLeft='',
+				cssRight='',
+				cssTop=pos.y+"px",
+				spotsArray=_this.spotsArray;
+
+			this.originInfo={width:img.clientWidth,height:img.clientHeight,src:img.src,pos:ev.getXY(img)};
 
 			var	slideLeft=_this.isSlideLeft();
-
 			var dis=ev.isVisible(img)&&img.clientWidth>=config.imiw&&img.clientHeight>=config.imih?"block":"none";
 			function setFloat(direction){
 					if(isIE){
@@ -118,35 +121,33 @@
 				if(slideLeft){
 					setFloat("right");
 					_this.contents.className="in-contents-wrapper in-contents-slideleft";
-					_this.adWrapper.style.left="auto";
-					_this.adWrapper.style.right=(Math.max(document.body.clientWidth,document.documentElement.clientWidth)-pos.x-w-26)+"px";
+					cssLeft="auto";
+					cssRight=(Math.max(document.body.clientWidth,document.documentElement.clientWidth)-pos.x-w-26)+"px";
 				}else{
 					setFloat("left");
 					_this.contents.className="in-contents-wrapper";
-					_this.adWrapper.style.right="auto";
-					_this.adWrapper.style.left=left;
+					cssRight="auto";
+					cssLeft=(pos.x+w)+"px";
 				}
 			}else if(config.position==1){		//图片左侧
 
 				if(slideLeft){
 					setFloat("right");
 					_this.contents.className="in-contents-wrapper";
-					_this.adWrapper.style.right=right;
-					_this.adWrapper.style.left="auto";
+					cssRight=(Math.max(document.body.clientWidth,document.documentElement.clientWidth)-pos.x)+'px';
+					cssLeft="auto";
 
 				}else{
 					setFloat("left");
 					_this.contents.className="in-contents-wrapper in-contents-slideright";
-					_this.adWrapper.style.left=(pos.x-26)+"px";
-					_this.adWrapper.style.right="auto";
+					cssLeft=(pos.x-26)+"px";
+					cssRight="auto";
 
 				}
 
 		    }
 
-			_this.adWrapper.style.top=top;
-			_this.adWrapper.style.display=dis;
-			// _this.adWrapper.style.cssText="left:"+left+";top:"+top+";display:"+dis;
+			_this.adWrapper.style.cssText+=";left:"+cssLeft+";right:"+cssRight+";top:"+cssTop+";display:"+dis;
 			// 判断是否自动展现广告
 			if(dis=='block'&&config.footAuto&&_this.isFirst!==false){
 
@@ -361,15 +362,16 @@
 		},
 
 		hideApps:function(){
-			var _this=this,list=_this.tabs.children;
-			//寻找focus tab
-			for(var j=list.length;j--;){
+			var _this=this,
+				list=_this.tabs.children;
+
+			for(var j=list.length;j--;){	//寻找focus tab
 				if(list[j].className.match("focus")){
 					list[j].className=list[j].className.replace(" focus","");
 				}
 			}
-			//如果是IE用display:none来隐藏应用
-			if(isIE){
+
+			if(isIE){	//如果是IE用display:none来隐藏应用
 				hide(_this.contents.children);
 			}else{   //否则用visible:hidden
 				each(_this.contents.children,function(){
@@ -385,7 +387,11 @@
 			this.contents.style.width=0;
 		},
 		showApp: function(tab){
-			var _this=this,list=_this.tabs.children,type,app,width;
+			var _this=this,
+				list=_this.tabs.children,
+				type,
+				app,
+				width;
 			if(list.length===0){
 				return;
 			}
@@ -398,11 +404,10 @@
 				_this.adWrapper.style.width=(config.width+42)+'px';
 			}
 			tab.className+=" focus";
-			//如果是IE用display:block来显示应用
-			if(isIE){
+
+			if(isIE){	//如果是IE用display:block来显示应用
 				show(ev.$(_this.contents,'li',type));
-			}
-			else{   //否则用visibility:visible
+			}else{   //否则用visibility:visible
 			   each(ev.$(_this.contents,'li',type),function(){
 					this.style.cssText="display:block;visibility:visible;height:auto;";
 			   });
@@ -526,7 +531,7 @@
 
 
 		}
-	},InstreetAd.prototype);
+	});
 
 
 	/*****************************

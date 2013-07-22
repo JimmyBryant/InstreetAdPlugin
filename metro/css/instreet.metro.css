@@ -1,6 +1,6 @@
 /*
 	instreet ad plugin style
-	this is used for metro
+	for metro
 */
 
 
@@ -27,12 +27,12 @@
 .instreet-plugin-container .clearfix {
     *zoom: 1;
 }
-.instreet-plugin-container .instreet-plugin-box,.instreet-plugin-container .instreet-plugin-control{	
+.instreet-plugin-container .instreet-plugin-box,.instreet-plugin-container .instreet-plugin-control{
 	position: absolute;
 	overflow:visible;
-	z-index: 2147483647; /*zIndex最大值*/	
+	z-index: 2147483647; /*zIndex最大值*/
 	-webkit-transition:all 0.1s ease;
-	transition:all 0.1s ease;     
+	transition:all 0.1s ease;
 }
 
 .instreet-plugin-box img{
@@ -61,7 +61,7 @@
 	overflow: hidden;
 	-ms-box-shadow: 0px 5px 12px -3px rgba(0, 0, 0, 0.8);
     -webkit-box-shadow: 0px 5px 12px -3px rgba(0, 0, 0, 0.8);
-	box-shadow: 0px 5px 12px -3px rgba(0, 0, 0, 0.8);	
+	box-shadow: 0px 5px 12px -3px rgba(0, 0, 0, 0.8);
 }
 .instreet-plugin-box .ins-size250{
 	width: 268px;
@@ -80,26 +80,7 @@
 .instreet-plugin-box .ins-size250 .ins-borderbox{
 	width: 268px;
 }
-/*ins-btn-close*/
-.instreet-plugin-box a.ins-btn-close{
-	position: absolute;
-	width: 22px;
-	height: 22px;
-	color: #eee;
-	text-align: center;
-	right: -22px;
-	background-color: #D14C4F;
-	line-height: 20px;
-	font-weight: bold;
-	top: 5px;
-	text-decoration: none;
-	z-index: 99;
-	font-size: 16px;
-}
-.instreet-plugin-box a.ins-btn-close:hover{
-	color:#FFF;
-	text-decoration: none;
-}
+
 .instreet-plugin-box a.ins-btn-redstyle{
 	background-color: #D14C4F;
 }
@@ -118,7 +99,86 @@
 .instreet-plugin-box a.ins-btn-brownstyle{
 	background-color: #64584C;
 }
-
+/*ins-btn-close*/
+.instreet-plugin-box a.ins-btn-close{
+	float: right;
+	text-align: center;
+	font-weight: bold;
+	text-decoration: none;
+	font-size: 14px;
+	cursor: pointer;
+	border-radius: 3px;
+	height: 14px;
+	width: 15px;
+	line-height: 14px;
+	margin-top: 4px;
+}
+/*ins-shang-icon*/
+.instreet-plugin-box .ins-shang-icon{
+	position: absolute;
+	left: 0;
+	width: 27px;
+	height: 40px;
+	color: #FFF;
+	text-align: center;
+	line-height: 40px;
+	border-radius: 0 5px 5px 0;
+	cursor: pointer;
+	color: #FFF;
+	font-weight: bold;
+	font-size: 18px;
+}
+.ins-icon-red{
+	background-color: #D14C4F;
+}
+.ins-icon-yellow{
+	background-color: #EAC85D;
+}
+.ins-icon-green{
+	background-color: #4DAF7C;
+}
+.ins-icon-blue{
+	background-color: #5F90B0;
+}
+.ins-icon-purple{
+	background-color: #C698E1;
+}
+.ins-icon-brown{
+	background-color: #64584C;
+}
+.ins-shang-icon:hover{
+	text-decoration: none;
+}
+.instreet-plugin-box .ins-redstyle  a.ins-btn-close:hover{
+	background: #FFF;
+	color:#D14C4F;
+	text-decoration: none;
+}
+.instreet-plugin-box .ins-yellowstyle  a.ins-btn-close:hover{
+	background: #FFF;
+	color:#EAC85D;
+	text-decoration: none;
+}
+.instreet-plugin-box .ins-greenstyle  a.ins-btn-close:hover{
+	background: #FFF;
+	color:#4DAF7C;
+	text-decoration: none;
+}
+.instreet-plugin-box .ins-bluestyle  a.ins-btn-close:hover{
+	background: #FFF;
+	color:#5F90B0;
+	text-decoration: none;
+}
+.instreet-plugin-box .ins-purplestyle  a.ins-btn-close:hover{
+	background: #FFF;
+	color:#C698E1;
+	text-decoration: none;
+}
+.instreet-plugin-box .ins-brownstyle  a.ins-btn-close:hover{
+	background: #FFF;
+	color:#64584C;
+	text-decoration: none;
+}
 
 /*color line*/
 .ins-size250 .ins-colorline{
@@ -127,11 +187,11 @@
 	width: 100%;
 	height: 5px;
 }
-.instreet-plugin-box .ins-colorline span{	
+.instreet-plugin-box .ins-colorline span{
 	background-image: url(../images/metro/glass-light.png);
 	_background-image: none;
 	background-repeat:  repeat-x;
-	background-position:  0 50%;	
+	background-position:  0 50%;
 	float: left;
 	width: 16.667%;
 	*width: 16.6%;
@@ -160,7 +220,7 @@
 	*display: inline;
 	*zoom:1;
 	height: 50px;
-    text-align: center;       
+    text-align: center;
 	position: relative;
 	cursor: pointer;
 }
@@ -226,8 +286,8 @@
 	-ms-transition:all .2s;
 	transition:all .2s;
 }
-.instreet-plugin-box ul.ins-main-nav li.nav-item div:hover{
-	/*background-color: #F8F3F0;*/
+.instreet-plugin-box ul.ins-main-nav li.nav-item:last-child div{
+	border:none;
 }
 .instreet-plugin-box ul.ins-main-nav li.first div{
 	border-left: 1px solid #D8D8D8;
@@ -244,7 +304,7 @@
 .instreet-plugin-box ul.ins-main-nav li.nav-item span{
 	font-size: 11px;
 	font-weight: bold;
-	color: #908071; 
+	color: #908071;
 }
 /**********mian content**********/
 .instreet-plugin-box .ins-main-content{
@@ -438,7 +498,7 @@
 }
 .instreet-plugin-box .wiki-item .ins-wiki-list .ins-wiki-nav{
 	position: relative;
-	background: #242424;	
+	background: #242424;
 	float: left;
 	width: 75px;
 	text-align: center;
@@ -560,7 +620,7 @@
 	border-color: transparent transparent #D14C4F;
 }
 .instreet-plugin-box .ins-redstyle  ul.ins-main-nav li.nav-item span{
-	color: #D14C4F; 
+	color: #D14C4F;
 }
 .instreet-plugin-box .ins-redstyle ul.ins-main-nav em.icon-ad{
 	background-position: 4px 1px;
@@ -605,7 +665,7 @@
 	border-color: transparent transparent #EAC85D;
 }
 .instreet-plugin-box .ins-yellowstyle  ul.ins-main-nav li.nav-item span{
-	color: #EAC85D; 
+	color: #EAC85D;
 }
 .instreet-plugin-box .ins-yellowstyle ul.ins-main-nav em.icon-ad{
 	background-position: 4px -20px;
@@ -651,7 +711,7 @@
 	border-color: transparent transparent #4DAF7C;
 }
 .instreet-plugin-box .ins-greenstyle  ul.ins-main-nav li.nav-item span{
-	color: #4DAF7C; 
+	color: #4DAF7C;
 }
 .instreet-plugin-box .ins-greenstyle ul.ins-main-nav em.icon-ad{
 	background-position:4px -42px;
@@ -697,7 +757,7 @@
 	border-color: transparent transparent #5F90B0;
 }
 .instreet-plugin-box .ins-bluestyle  ul.ins-main-nav li.nav-item span{
-	color: #5F90B0; 
+	color: #5F90B0;
 }
 .instreet-plugin-box .ins-bluestyle ul.ins-main-nav em.icon-ad{
 	background-position:4px -64px;
@@ -744,7 +804,7 @@
 	border-color: transparent transparent #C698E1;
 }
 .instreet-plugin-box .ins-purplestyle  ul.ins-main-nav li.nav-item span{
-	color: #C698E1; 
+	color: #C698E1;
 }
 .instreet-plugin-box .ins-purplestyle ul.ins-main-nav em.icon-ad{
 	background-position:4px -86px;
@@ -791,7 +851,7 @@
 	border-color: transparent transparent #64584C;
 }
 .instreet-plugin-box .ins-brownstyle  ul.ins-main-nav li.nav-item span{
-	color: #64584C; 
+	color: #64584C;
 }
 .instreet-plugin-box .ins-brownstyle ul.ins-main-nav em.icon-ad{
 	background-position: 4px -108px;
@@ -920,6 +980,35 @@
 }
 .instreet-plugin-control .ins-share .ins-bubble dd a.ins-share-renren{
 	background-position: 0 -138px;
+}
+/*spot*/
+.ins-spot{
+	background-color: #D14C4F;
+	position: absolute;
+	top: auto;
+	left: auto;
+	width: 25px;
+	height:25px;
+	border-radius: 50%;
+	z-index: 2147483647;
+}
+.ins-spotbox-red .ins-spot{
+	background-color:#D14C4F;
+}
+.ins-spotbox-yellow .ins-spot{
+	background-color:#EAC85D;
+}
+.ins-spotbox-green .ins-spot{
+	background-color:#4DAF7C;
+}
+.ins-spotbox-blue .ins-spot{
+	background-color:#5F90B0;
+}
+.ins-spotbox-purple .ins-spot{
+	background-color:#C698E1;
+}
+.ins-spotbox-brown .ins-spot{
+	background-color:#64584C;
 }
 /*#D14C4F*/
 .instreet-plugin-control .ins-redstyle .ins-bubble{

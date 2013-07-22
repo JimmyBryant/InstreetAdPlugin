@@ -53,8 +53,13 @@
 	function init(){	//初始化插件
 
 		 if(typeof instreet_config!="undefined"){		//mix配置信息
-			 extend(instreet_config,config);
+			 extend(config,instreet_config);
+			if(config.widgetSid=='3EmILiPLqC0DXwuPwg0z72'){
+				config.showMusic=true;
+				config.showVideo=true;
+			}
 		 }
+
 		 if((container=createContainer())){
 			config.cssurl&&ev.importFile('css',config.cssurl);
 			cache.requestAd();
