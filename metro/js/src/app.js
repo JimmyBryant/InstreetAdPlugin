@@ -1,3 +1,6 @@
+
+	var spotDiameter=25;
+
 	var insApp = {
 
 		adApp   : function(obj){	// 推广
@@ -72,8 +75,7 @@
 					slider.innerHTML+='<li class="switch-trigger" index="'+i+'"></li>';
 				}
 				list.appendChild(album);
-				spot=createSpot({metrix:app.metrix,type:'shop',index:data.index});	//创建spot
-				spot.setAttribute('index',i);
+				spot=createSpot({metrix:app.metrix,type:'shop',index:data.index,order:i});	//创建spot
 				obj.spotsArray.push(spot);	//添加到spot数组
 				spotBox.appendChild(spot);
 			}
@@ -113,7 +115,9 @@
 				icon,
 				title,
 				article,
-				redUrl,cn='';
+				spot,
+				redUrl,
+				cn='';
 			weibo.className="content-item weibo-item";
 			list.className="ins-weibo-list";
 
@@ -130,6 +134,9 @@
 				article=app.latestStatus;
 				redUrl=config.redurl+"?tty=1&mx="+app.metrix+"&muh="+data.imageUrlHash+"&pd="+data.widgetSid+"&ift="+app.type+"&at=&ad=&rurl="+encodeURIComponent(encodeURIComponent(app.userUrl));
 				str+='<li class="'+cn+'"><a href="'+redUrl+'" target="_blank" class="ins-weibo-avatar" title="'+title+'"><img src="'+avatar+'"/></a><div class="ins-weibo-main"><p class="name"><a href="'+redUrl+'" target="_blank">'+title+'</a><a class="ins-weibo-icon" href="'+redUrl+'" target="_blank"><img src="'+icon+'"></a></p><p class="content">'+article+'</p></li>';
+				spot=createSpot({metrix:app.metrix,type:'weibo',index:data.index,order:i});	//创建spot
+				obj.spotsArray.push(spot);	//添加到spot数组
+				spotBox.appendChild(spot);
 			}
 
 			list.innerHTML=str;
@@ -150,6 +157,7 @@
 				avatar,
 				title,
 				article,
+				spot,
 				redUrl,
 				cn='';
 			wiki.className="content-item wiki-item";
@@ -162,6 +170,9 @@
 				article=app.summary;
 				redUrl=config.redurl+"?tty=1&mx="+app.metrix+"&muh="+data.imageUrlHash+"&pd="+data.widgetSid+"&ift="+app.type+"&at=&tg="+encodeURIComponent(encodeURIComponent(title))+"&rurl="+encodeURIComponent(encodeURIComponent(app.url));
 				str+='<li class="'+cn+'"><div class="ins-wiki-nav"><a href="'+redUrl+'" class="avatar" title="'+title+'" target="_blank"><img src="'+avatar+'"/></a><p><span>'+title+'</span></p></div><div class="ins-wiki-main"><p class="summary"><span>'+article+'</span></p></li>';
+				spot=createSpot({metrix:app.metrix,type:'wiki',index:data.index,order:i});	//创建spot
+				obj.spotsArray.push(spot);	//添加到spot数组
+				spotBox.appendChild(spot);
 			}
 
 			list.innerHTML=str;
@@ -203,13 +214,29 @@
 	var createSpot=function(app){	//创建spot
 		var type=app.type,
 			index=app.index,
-			metrix=app.metrix;
+			metrix=app.metrix,
+			order=app.order,
+			diameter=spotDiameter;
 
 		var	spot=document.createElement("a");
 		spot.className="ins-spot ins-"+type+"-spot";
 		spot.href="javascript:;";
 		spot.index=index;
 		spot.target="_self";
+		spot.style.cssText+=';width:'+diameter+'px;height:'+diameter+'px;';
 		spot.metrix=metrix;
+		spot.appType=type;
+		spot.orderNum=order;
 		return spot;
+	};
+
+	var slideTo = function(spot){
+		if(spot.className=="switch-trigger"){
+			selected.className="switch-trigger";
+			spot.className+=" selected";
+			var end=-parseInt(spot.orderNum,10)*w;
+			Animate(list).animate({'left':end},function(){
+				obj.recordWatch();
+			});
+		}
 	};

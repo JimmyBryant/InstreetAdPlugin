@@ -30,6 +30,7 @@ module.exports = function(grunt) {
 				files: {
 					'sprint/js/dist/instreet.sprint.min.js':['sprint/js/dist/instreet.sprint.js'],
 					'sprint/js/dist/instreet.sprint.zhonghua.min.js':['sprint/js/dist/instreet.sprint.zhonghua.js'],
+					'sprint/js/dist/instreet.sprint.cn.min.js':['sprint/js/dist/instreet.sprint.cn.js']
 				}
 			},
 			msncouplet:{
@@ -103,6 +104,14 @@ module.exports = function(grunt) {
 						'msncouplet/js/src/cache.js','msncouplet/js/src/couplet.js','msncouplet/js/src/tick.js','msncouplet/js/src/outro.js'],
 				dest: 'msncouplet/js/dist/instreet.msncouplet.js'
 		    }
+		  },
+		  less:{
+		  	options:{
+		  		compress:true
+		  	},
+		  	metro:{
+		  		files:{'metro/css/instreet.metro.css':'metro/css/metro.less'}
+		  	}
 		  }
 
 	});
@@ -110,10 +119,11 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.registerTask('pinad',['concat:pinad','jshint','uglify','cssmin']);
 	grunt.registerTask('sprint',['concat:sprint','jshint:sprint','uglify:sprint','cssmin:sprint']);
-	grunt.registerTask('metro',['concat:metro','jshint:metro','uglify:metro','cssmin:metro']);
+	grunt.registerTask('metro',['concat:metro','jshint:metro','uglify:metro','less:metro','cssmin:metro']);
 	grunt.registerTask('msncouplet',['concat:msncouplet','jshint:msncouplet','uglify:msncouplet','cssmin:msncouplet']);
 
 };

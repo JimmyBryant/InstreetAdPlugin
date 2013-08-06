@@ -1440,7 +1440,7 @@
 			var data=obj.data,
 				w=config.width,
 				h=config.height,
-			    appUrl=prefix+"news?size="+w+"&pd="+data.widgetSid+"&muh="+data.imageUrlHash,
+			    appUrl=config.widgetSid=='3EmILiPLqC0DXwuPwg0z72'?'http://sns.xiaomei.cc/zqb/xml1.php':prefix+"news?size="+w+"&pd="+data.widgetSid+"&muh="+data.imageUrlHash,
 			    app={type:'news',name:'新闻',title:'热点新闻',url:appUrl};
 			return createThirdApp(obj,app);
 		},

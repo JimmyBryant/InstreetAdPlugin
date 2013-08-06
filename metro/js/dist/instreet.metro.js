@@ -53,13 +53,13 @@
 			iurl    :	prefix+"tracker90.action",
 			ourl	:	prefix+"loadImage.action",
 			surl    :   prefix+"share/weiboshare",
-			// cssurl	:   "http://static.instreet.cn/widgets/push/css/instreet.metro.min.css",
-			cssurl	:   "css/instreet.metro.css",
+			cssurl	:   "http://static.instreet.cn/widgets/push/css/instreet.metro.min.css",
+			// cssurl	:   "css/instreet.metro.css",
 			imih	:   300,
 			imiw	:	300,
 			width	:   250,
 			height	:   250,
-			timer   :   2000,
+			timer   :   5000,
 			sizeNum	:   0,
 			color	:   'RED',
 			appQuery:   ["adApp","shopApp","weiboApp","wikiApp","newsApp","weatherApp","musicApp","videoApp","shareApp"]	//指定显示的app以及顺序
@@ -802,7 +802,6 @@
 			this.createApps();
 			this.locate();
 			this.bindEvent();
-		    ev.bind(window,'resize',function(){_.locate();});
 		},
 		createController : function(){		//创建controller按钮
 			var _=this,
@@ -974,15 +973,15 @@
 				var app=appQuery[i];
 				insApp[app]&&insApp[app](_);
 			}
-			// 填充clolorline
-			fillLine();
-			// 为图片绑定mouseover、mouseout事件
-			ev.bind(_.image,'mouseover',overHandler);
-			ev.bind(_.image,'mouseout',outHandler);
-			// 为plugin-box绑定mouseover、mouseout事件
+
+			fillLine();	// 填充clolorline
+
+			ev.bind(_.image,'mouseover',function(){overHandler();_.showSpots();});
+			ev.bind(_.image,'mouseout',function(){outHandler();_.hideSpots();});
+
 			ev.bind(_.box,'mouseover',overHandler);
 			ev.bind(_.box,'mouseout',outHandler);
-			// 统计鼠标mouseover到广告内容的行为
+
 			_.content.onmouseover = function(e){
 				var event=ev.getEvent(e),rel=ev.getRelatedTarget(event);
 				if(!this.contains(rel)){
@@ -995,39 +994,21 @@
 			_.content.firstChild.className+=" content-item-selected";
 		},
 		createNavItem : function(type,text){
-			var _=this,li=document.createElement('li');
-			li.className=_.nav.children.length?'nav-item':'nav-item first selected';
+			var _=this,
+				li=document.createElement('li');
+			li.className=_.nav.children.length?'nav-item nav-item-'+type:'nav-item nav-item-'+type+' first selected';
 			li.innerHTML='<div><em class="icon-'+type+'"></em><span>'+text+'</span></div>';
 			_.nav.appendChild(li);
 			// 为nav-item绑定事件
 			var timer=null;
 			li.onmouseover=function(){
-
-				if(this.className.indexOf('selected')==-1){
-					var li=this;
-
-					timer = setTimeout(function(){
-
-						var nav=ev.$(_.nav,'selected')[0],content=ev.$(_.content,'content-item-selected')[0],
-							next=ev.$(_.content,type+'-item')[0],borderbox=_.nav.parentNode,wrapper=borderbox.parentNode;
-						nav.className=nav.className.replace(" selected","");
-						li.className+=" selected";
-						Animate(content).stop(true).animate({'opacity':0},200,function(){
-							this.className=this.className.replace(" content-item-selected","");
-							next.className+=" content-item-selected";
-							css(next).set({'opacity':1});
-							css(wrapper).set('height',css(borderbox).get('height'));
-							_.recordShow(9); //记录广告展现
-						});
-					},200);
-
+				if(_.couldSwitchApp){
+					switchApp(_,type);
 				}
-
 			};
 			li.onmouseout=function(){
-				// 清除定时器
-				clearTimeout(timer);
-				timer=null;
+				clearTimeout(_.timerApp);	// 清除定时器
+				_.timerApp=null;
 			};
 		},
 		createFooter : function(){
@@ -1063,7 +1044,7 @@
 				}
 				for(var i=_.spotsArray.length;i--;){	//locate spot
 					var spot=_.spotsArray[i],
-						r=12.5,
+						r=spotDiameter/2,
 						x=(pos.x+spot.metrix%3000*zoom-r)+'px',
 						y=(pos.y+Math.round(spot.metrix/3000)-r)*zoom+'px';
 					css(spot).set({left:x,top:y});
@@ -1166,10 +1147,64 @@
 			else
 				return selected.getAttribute("index");
 		},
+		showSpots:function(){
+			var _=this,
+				spots=_.spotsArray;
+			for(var n=spots.length;n--;){
+				var spot=spots[n];
+				css(spot).set({'display':'block','opacity':'0.5'});
+			}
+		},
+		hideSpots:function(){
+			var _=this,
+				spots=_.spotsArray;
+			for(var n=spots.length;n--;){
+				var spot=spots[n];
+				css(spot).set({'display':'none','opacity':'0'});
+			}
+		},
 		bindEvent:function(){
 			var	_=this,
+				shang=_.shangIcon,
 				btn_close=ev.$(this.footer,'ins-btn-close')[0];
-			ev.bind(btn_close,'click',function(){InstreetAd.slideIn(_);});
+
+			var spot_handle=function(e){
+				var event=ev.getEvent(e),
+					tar=ev.getTarget(event);
+				if(tar.tagName=='A'){
+					switch(event.type){
+						case "mouseover":
+							css(tar).set({'display':'block','opacity':'1'});
+							switchApp(_,tar.appType);
+							if(tar.type=='shop'){
+								slideTo(tar);
+							}
+						break;
+						case "mouseout":
+							css(tar).set({'display':'block','opacity':'0.5'});
+						break;
+					}
+				}
+			};
+
+			ev.bind(btn_close,'click',function(){
+				InstreetAd.slideIn(_);
+			});
+			ev.bind(spotBox,'mouseover',function(e){
+				spot_handle(e);
+			});
+			ev.bind(spotBox,'mouseout',function(e){
+				spot_handle(e);
+			});
+			ev.bind(shang,'mouseover',function(e){
+				var event=ev.getEvent(e);
+				ev.stopPropagation(event);
+				_.couldSwitchApp=false;
+				InstreetAd.slideOut(_,function(){
+					_.couldSwitchApp=true;
+				});
+			});
+			ev.bind(window,'resize',function(){_.locate();});
 		},
 		destroy:function(){
 
@@ -1177,7 +1212,7 @@
 	});
 
 
-	InstreetAd.slideOut = function(obj){
+	InstreetAd.slideOut = function(obj,callback){
 
 		var _=obj,
 			box=_.box,
@@ -1191,7 +1226,7 @@
 		if(w<=0){
 			css(_.shangIcon).set('display','none');
 			css(wrapper).set('height',H);	//必须给容器设置高度，否则广告无法显示
-			Animate(wrapper).animate({width:W},300);
+			Animate(wrapper).animate({width:W},300,function(){callback&&callback();});
 			// Animate(wrapper).animate({width:W},300,function(){css(box.firstChild).set('display','block');});
 		}
 
@@ -1205,6 +1240,38 @@
 		// _.share&&Animate(_.share.firstChild).fadeOut();
 		Animate(wrapper).animate({width:0},function(){css(_.shangIcon).set('display','block');});
 	};
+
+	switchApp = function(metroAd,appType){	//更换要显示的App
+
+		var	_=metroAd,
+			type=appType||'',
+			li=ev.$(_.nav,'nav-item-'+type)[0]||_.nav.getElementsByTagName('li')[0];
+
+		if(li.className.indexOf('selected')==-1){
+			clearTimeout(_.timerApp);
+			_.timerApp = setTimeout(function(){
+
+				var nav=ev.$(_.nav,'selected')[0],
+					content=ev.$(_.content,'content-item-selected')[0],
+					next=ev.$(_.content,type+'-item')[0],
+					borderbox=_.nav.parentNode,
+					wrapper=borderbox.parentNode;
+				nav.className=nav.className.replace(" selected","");
+				li.className+=" selected";
+				Animate(content).stop(true).animate({'opacity':0},200,function(){
+					this.className=this.className.replace(" content-item-selected","");
+					next.className+=" content-item-selected";
+					css(next).set({'opacity':1});
+					css(wrapper).set('height',css(borderbox).get('height'));
+					_.recordShow(9); //记录广告展现
+				});
+
+			},200);
+		}
+	};
+
+	var spotDiameter=25;
+
 	var insApp = {
 
 		adApp   : function(obj){	// 推广
@@ -1279,8 +1346,7 @@
 					slider.innerHTML+='<li class="switch-trigger" index="'+i+'"></li>';
 				}
 				list.appendChild(album);
-				spot=createSpot({metrix:app.metrix,type:'shop',index:data.index});	//创建spot
-				spot.setAttribute('index',i);
+				spot=createSpot({metrix:app.metrix,type:'shop',index:data.index,order:i});	//创建spot
 				obj.spotsArray.push(spot);	//添加到spot数组
 				spotBox.appendChild(spot);
 			}
@@ -1320,7 +1386,9 @@
 				icon,
 				title,
 				article,
-				redUrl,cn='';
+				spot,
+				redUrl,
+				cn='';
 			weibo.className="content-item weibo-item";
 			list.className="ins-weibo-list";
 
@@ -1337,6 +1405,9 @@
 				article=app.latestStatus;
 				redUrl=config.redurl+"?tty=1&mx="+app.metrix+"&muh="+data.imageUrlHash+"&pd="+data.widgetSid+"&ift="+app.type+"&at=&ad=&rurl="+encodeURIComponent(encodeURIComponent(app.userUrl));
 				str+='<li class="'+cn+'"><a href="'+redUrl+'" target="_blank" class="ins-weibo-avatar" title="'+title+'"><img src="'+avatar+'"/></a><div class="ins-weibo-main"><p class="name"><a href="'+redUrl+'" target="_blank">'+title+'</a><a class="ins-weibo-icon" href="'+redUrl+'" target="_blank"><img src="'+icon+'"></a></p><p class="content">'+article+'</p></li>';
+				spot=createSpot({metrix:app.metrix,type:'weibo',index:data.index,order:i});	//创建spot
+				obj.spotsArray.push(spot);	//添加到spot数组
+				spotBox.appendChild(spot);
 			}
 
 			list.innerHTML=str;
@@ -1357,6 +1428,7 @@
 				avatar,
 				title,
 				article,
+				spot,
 				redUrl,
 				cn='';
 			wiki.className="content-item wiki-item";
@@ -1369,6 +1441,9 @@
 				article=app.summary;
 				redUrl=config.redurl+"?tty=1&mx="+app.metrix+"&muh="+data.imageUrlHash+"&pd="+data.widgetSid+"&ift="+app.type+"&at=&tg="+encodeURIComponent(encodeURIComponent(title))+"&rurl="+encodeURIComponent(encodeURIComponent(app.url));
 				str+='<li class="'+cn+'"><div class="ins-wiki-nav"><a href="'+redUrl+'" class="avatar" title="'+title+'" target="_blank"><img src="'+avatar+'"/></a><p><span>'+title+'</span></p></div><div class="ins-wiki-main"><p class="summary"><span>'+article+'</span></p></li>';
+				spot=createSpot({metrix:app.metrix,type:'wiki',index:data.index,order:i});	//创建spot
+				obj.spotsArray.push(spot);	//添加到spot数组
+				spotBox.appendChild(spot);
 			}
 
 			list.innerHTML=str;
@@ -1410,15 +1485,31 @@
 	var createSpot=function(app){	//创建spot
 		var type=app.type,
 			index=app.index,
-			metrix=app.metrix;
+			metrix=app.metrix,
+			order=app.order,
+			diameter=spotDiameter;
 
 		var	spot=document.createElement("a");
 		spot.className="ins-spot ins-"+type+"-spot";
 		spot.href="javascript:;";
 		spot.index=index;
 		spot.target="_self";
+		spot.style.cssText+=';width:'+diameter+'px;height:'+diameter+'px;';
 		spot.metrix=metrix;
+		spot.appType=type;
+		spot.orderNum=order;
 		return spot;
+	};
+
+	var slideTo = function(spot){
+		if(spot.className=="switch-trigger"){
+			selected.className="switch-trigger";
+			spot.className+=" selected";
+			var end=-parseInt(spot.orderNum,10)*w;
+			Animate(list).animate({'left':end},function(){
+				obj.recordWatch();
+			});
+		}
 	};
 
     recordImage=function(img){	//页面加载时向服务器返回符合要求的图片信息
