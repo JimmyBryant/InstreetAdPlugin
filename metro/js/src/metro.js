@@ -227,7 +227,7 @@
 			// 为nav-item绑定事件
 			var timer=null;
 			li.onmouseover=function(){
-				if(_.couldSwitchApp){
+				if(_.couldSwitchApp!==false){
 					switchApp(_,type);
 				}
 			};
@@ -473,24 +473,27 @@
 			li=ev.$(_.nav,'nav-item-'+type)[0]||_.nav.getElementsByTagName('li')[0];
 
 		if(li.className.indexOf('selected')==-1){
-			clearTimeout(_.timerApp);
-			_.timerApp = setTimeout(function(){
+			if(_.couldSwitchApp!==false){
+				clearTimeout(_.timerApp);
+				_.timerApp = setTimeout(function(){
+					_.couldSwitchApp=false;
+					var nav=ev.$(_.nav,'selected')[0],
+						content=ev.$(_.content,'content-item-selected')[0],
+						next=ev.$(_.content,type+'-item')[0],
+						borderbox=_.nav.parentNode,
+						wrapper=borderbox.parentNode;
+					nav.className=nav.className.replace(" selected","");
+					li.className+=" selected";
+					Animate(content).stop(true).animate({'opacity':0},200,function(){
+						_.couldSwitchApp=true;
+						this.className=this.className.replace(" content-item-selected","");
+						next.className+=" content-item-selected";
+						css(next).set({'opacity':1});
+						css(wrapper).set('height',css(borderbox).get('height'));
+						_.recordShow(9); //记录广告展现
+					});
 
-				var nav=ev.$(_.nav,'selected')[0],
-					content=ev.$(_.content,'content-item-selected')[0],
-					next=ev.$(_.content,type+'-item')[0],
-					borderbox=_.nav.parentNode,
-					wrapper=borderbox.parentNode;
-				nav.className=nav.className.replace(" selected","");
-				li.className+=" selected";
-				Animate(content).stop(true).animate({'opacity':0},200,function(){
-					this.className=this.className.replace(" content-item-selected","");
-					next.className+=" content-item-selected";
-					css(next).set({'opacity':1});
-					css(wrapper).set('height',css(borderbox).get('height'));
-					_.recordShow(9); //记录广告展现
-				});
-
-			},200);
+				},200);
+			}
 		}
 	};
